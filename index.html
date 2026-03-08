@@ -67,8 +67,13 @@
             cursor: pointer; min-width: 200px;
             text-transform: uppercase; letter-spacing: 2px;
             transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
-        .btn:hover { background: #ff2244; box-shadow: 0 0 30px #ff002266; }
+        .btn:active, .btn:hover { background: #ff2244; box-shadow: 0 0 30px #ff002266; }
         
         /* JUEGO */
         #game { display: none; }
@@ -256,9 +261,9 @@
     <div id="menu">
         <h1 class="title">THE FORGOTTEN<br>PLAYROOM</h1>
         <p class="subtitle">Una fábrica abandonada... juguetes olvidados... terror</p>
-        <button class="btn" onclick="startGame()" ontouchend="startGame()">▶ JUGAR</button>
-        <button class="btn" onclick="showOverlay('charsScreen')" ontouchend="showOverlay('charsScreen')">PERSONAJES</button>
-        <button class="btn" onclick="showOverlay('controlsScreen')" ontouchend="showOverlay('controlsScreen')">CONTROLES</button>
+        <a class="btn" href="javascript:startGame()">▶ JUGAR</a>
+        <a class="btn" href="javascript:showOverlay('charsScreen')">PERSONAJES</a>
+        <a class="btn" href="javascript:showOverlay('controlsScreen')">CONTROLES</a>
         <p style="color:#ff2244; margin-top:30px; font-size:0.8rem;">⚠️ Terror psicológico - Mayores de 12</p>
     </div>
     
@@ -302,7 +307,7 @@
                 <div class="char-info"><h4>EMILY (BOSS)</h4><p>Muñeca de porcelana - Final</p></div>
             </div>
         </div>
-        <button class="btn" onclick="hideOverlay('charsScreen')" ontouchend="hideOverlay('charsScreen')">CERRAR</button>
+        <a class="btn" href="javascript:hideOverlay('charsScreen')">CERRAR</a>
     </div>
     
     <!-- CONTROLES -->
@@ -324,7 +329,7 @@
             <p>WASD: Mover | Shift: Correr</p>
             <p>E: Usar GrabPack | ESC: Pausar</p>
         </div>
-        <button class="btn" onclick="hideOverlay('controlsScreen')" ontouchend="hideOverlay('controlsScreen')">CERRAR</button>
+        <a class="btn" href="javascript:hideOverlay('controlsScreen')">CERRAR</a>
     </div>
     
     <!-- JUEGO -->
@@ -339,9 +344,9 @@
         <div id="chapterInfo" style="pointer-events: none;">CAPÍTULO 1</div>
         <div id="joystickArea"><div class="joystick-outer" id="joystickOuter"><div class="joystick-inner" id="joystickInner"></div></div></div>
         <div id="touchActions">
-            <button class="action-btn" id="btnRun" ontouchstart="window.touchRun(true,this)" ontouchend="window.touchRun(false,this)" onpointerdown="window.touchRun(true,this)" onpointerup="window.touchRun(false,this)">▶</button>
-            <button class="action-btn action-btngrab" id="btnGrab" ontouchstart="window.touchGrab(this)" onpointerdown="window.touchGrab(this)">🔌</button>
-            <button class="action-btn" id="btnPause" ontouchstart="window.touchPause(this)" onpointerdown="window.touchPause(this)">❚❚</button>
+            <a class="action-btn" id="btnRun" href="javascript:void(0)">▶</a>
+            <a class="action-btn action-btngrab" id="btnGrab" href="javascript:void(0)">🔌</a>
+            <a class="action-btn" id="btnPause" href="javascript:void(0)">❚❚</a>
         </div>
     </div>
     
@@ -353,7 +358,7 @@
         <div class="vhs-content">
             <div class="vhs-title" id="vhsTitle">📼 CINTA VHS</div>
             <div class="vhs-text" id="vhsText"></div>
-            <button class="btn" style="margin-top:20px;" onclick="closeVHS()">CONTINUAR</button>
+            <a class="btn" style="margin-top:20px; display:inline-block;" href="javascript:closeVHS()">CONTINUAR</a>
         </div>
     </div>
     
@@ -362,13 +367,13 @@
         <h2 style="color:#ff2244; margin-bottom:20px;">🔌 PUZZLE ELÉCTRICO</h2>
         <canvas id="puzzleCanvas" width="400" height="300"></canvas>
         <p style="color:#888; margin-top:15px;">Conecta los cables del mismo color</p>
-        <button class="btn" style="margin-top:10px;" onclick="closePuzzle()">CERRAR</button>
+        <a class="btn" style="margin-top:10px; display:inline-block;" href="javascript:closePuzzle()">CERRAR</a>
     </div>
     
     <!-- OTROS -->
-    <div id="pause" class="overlay"><h1>PAUSA</h1><p>El juego está pausado</p><button class="btn" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
-    <div id="gameOver" class="overlay"><h1>GAME OVER</h1><p id="deathMsg">Te atraparon...</p><button class="btn" onclick="startGame()">🔄 REINTENTAR</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
-    <div id="victory" class="overlay"><h1>¡ESCAPASTE!</h1><p>Sobreviviste a The Forgotten Playroom</p><button class="btn" onclick="startGame()">🔄 JUGAR DE NUEVO</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
+    <div id="pause" class="overlay"><h1>PAUSA</h1><p>El juego está pausado</p><a class="btn" href="javascript:resumeGame()">▶ CONTINUAR</a><a class="btn" href="javascript:quitGame()">🏠 MENÚ</a></div>
+    <div id="gameOver" class="overlay"><h1>GAME OVER</h1><p id="deathMsg">Te atraparon...</p><a class="btn" href="javascript:startGame()">🔄 REINTENTAR</a><a class="btn" href="javascript:quitGame()">🏠 MENÚ</a></div>
+    <div id="victory" class="overlay"><h1>¡ESCAPASTE!</h1><p>Sobreviviste a The Forgotten Playroom</p><a class="btn" href="javascript:startGame()">🔄 JUGAR DE NUEVO</a><a class="btn" href="javascript:quitGame()">🏠 MENÚ</a></div>
 
     <script>
     // ============================================
@@ -971,44 +976,42 @@
         outer.addEventListener('touchmove', e => { e.preventDefault(); if (active) handleJoystick(e.touches[0].clientX, e.touches[0].clientY); });
         outer.addEventListener('touchend', e => { e.preventDefault(); active = false; joystick = { x: 0, y: 0 }; inner.style.transform = 'translate(-50%, -50%)'; });
         
-        // Botones táctiles - Múltiples eventos para máxima compatibilidad
+        // Botones táctiles - Simplificado con eventos directos
         const btnRun = document.getElementById('btnRun');
         const btnGrab = document.getElementById('btnGrab');
         const btnPause = document.getElementById('btnPause');
         
-        // Función para activar botón
-        const setupBtn = (btn, onPress, onRelease) => {
-            // Touch events
-            btn.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); onPress(btn); }, { passive: false });
-            btn.addEventListener('touchend', e => { e.preventDefault(); e.stopPropagation(); if (onRelease) onRelease(btn); }, { passive: false });
-            btn.addEventListener('touchcancel', e => { e.preventDefault(); if (onRelease) onRelease(btn); }, { passive: false });
-            // Pointer events (más compatibles)
-            btn.addEventListener('pointerdown', e => { e.preventDefault(); onPress(btn); }, { passive: false });
-            btn.addEventListener('pointerup', e => { e.preventDefault(); if (onRelease) onRelease(btn); }, { passive: false });
-            btn.addEventListener('pointercancel', e => { if (onRelease) onRelease(btn); });
-            // Mouse events (para PC/testing)
-            btn.addEventListener('mousedown', e => { e.preventDefault(); onPress(btn); });
-            btn.addEventListener('mouseup', e => { if (onRelease) onRelease(btn); });
-            btn.addEventListener('mouseleave', e => { if (onRelease) onRelease(btn); });
-        };
+        // Botón Correr - mantener presionado para correr
+        if (btnRun) {
+            const startRun = (e) => { e.preventDefault(); running = true; btnRun.classList.add('pressed'); };
+            const stopRun = (e) => { e.preventDefault(); running = false; btnRun.classList.remove('pressed'); };
+            btnRun.addEventListener('touchstart', startRun, { passive: false });
+            btnRun.addEventListener('touchend', stopRun, { passive: false });
+            btnRun.addEventListener('touchcancel', stopRun, { passive: false });
+            btnRun.addEventListener('mousedown', startRun);
+            btnRun.addEventListener('mouseup', stopRun);
+            btnRun.addEventListener('mouseleave', stopRun);
+        }
         
-        // Botón Correr
-        setupBtn(btnRun, 
-            btn => { running = true; btn.classList.add('pressed'); },
-            btn => { running = false; btn.classList.remove('pressed'); }
-        );
-        
-        // Botón GrabPack
-        setupBtn(btnGrab, 
-            btn => { btn.classList.add('pressed'); useGrabPack(); },
-            btn => { btn.classList.remove('pressed'); }
-        );
+        // Botón GrabPack - un toque activa
+        if (btnGrab) {
+            const doGrab = (e) => { e.preventDefault(); btnGrab.classList.add('pressed'); useGrabPack(); };
+            const endGrab = () => { btnGrab.classList.remove('pressed'); };
+            btnGrab.addEventListener('touchstart', doGrab, { passive: false });
+            btnGrab.addEventListener('touchend', endGrab, { passive: false });
+            btnGrab.addEventListener('mousedown', doGrab);
+            btnGrab.addEventListener('mouseup', endGrab);
+        }
         
         // Botón Pausa
-        setupBtn(btnPause,
-            btn => { btn.classList.add('pressed'); if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); },
-            btn => { btn.classList.remove('pressed'); }
-        );
+        if (btnPause) {
+            const doPause = (e) => { e.preventDefault(); btnPause.classList.add('pressed'); if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); };
+            const endPause = () => { btnPause.classList.remove('pressed'); };
+            btnPause.addEventListener('touchstart', doPause, { passive: false });
+            btnPause.addEventListener('touchend', endPause, { passive: false });
+            btnPause.addEventListener('mousedown', doPause);
+            btnPause.addEventListener('mouseup', endPause);
+        }
     }
     
     function useGrabPack() {
