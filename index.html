@@ -111,6 +111,27 @@
         #btnGrab { border-color: #22aaff; }
         #btnGrab:active { background: #22aaff; }
         
+        /* COUNTDOWN */
+        #countdown {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 175;
+        }
+        #countdown.active { display: flex; }
+        #countdown h1 {
+            font-size: 8rem;
+            color: #ff2244;
+            text-shadow: 0 0 50px #ff0022;
+            animation: pulse 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { transform: scale(2); opacity: 0; }
+            50% { transform: scale(1.2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
         /* OVERLAYS */
         .overlay {
             position: fixed; inset: 0;
@@ -161,6 +182,11 @@
         </div>
     </div>
     
+    <!-- COUNTDOWN -->
+    <div id="countdown">
+        <h1 id="countdownNum">3</h1>
+    </div>
+    
     <!-- CHAPTER SCREEN -->
     <div id="chapterScreen">
         <h1 id="chapTitle">CAPÍTULO 1</h1>
@@ -186,7 +212,7 @@
 
     <script>
     // ========================================
-    // THE FORGOTTEN PLAYROOM - SIMPLIFIED
+    // THE FORGOTTEN PLAYROOM - EASY MODE
     // ========================================
     
     // Estado del juego - INICIALIZADO PRIMERO
@@ -195,7 +221,8 @@
         chapter: 1,
         player: { x: 0, y: 0, hp: 100, stamina: 100, light: 100 },
         enemies: [],
-        exit: { x: 0, y: 0 }
+        exit: { x: 0, y: 0 },
+        countdownActive: false
     };
     
     // Referencias DOM
@@ -208,12 +235,24 @@
     const IS_MOBILE = 'ontouchstart' in window || navigator.userAgent.includes('Mobile');
     const CHAPTERS = ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily'];
     
+    // CONFIGURACIÓN DE DIFICULTAD
+    const DIFFICULTY = {
+        enemySpeed: 0.5,           // Velocidad base (era 1)
+        speedPerChapter: 0.1,      // Incremento por capítulo (era 0.2)
+        minSpawnDistance: 300,      // Distancia mínima del jugador
+        collisionRadius: 50,        // Radio de colisión (era 30)
+        damagePerHit: 2,            // Daño por frame (era 5)
+        lightRadius: 300,           // Radio de luz (era 200)
+        playerSpeed: 4,             // Velocidad caminando
+        playerSprint: 7             // Velocidad corriendo
+    };
+    
     // ========================================
     // INICIALIZACIÓN
     // ========================================
     
     function init() {
-        console.log('🎮 Iniciando juego...');
+        console.log('🎮 Iniciando juego (Easy Mode)...');
         
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
@@ -246,7 +285,7 @@
             }
         });
         
-        console.log('✅ Juego listo');
+        console.log('✅ Juego listo - Easy Mode activado');
         
         // Iniciar game loop
         requestAnimationFrame(gameLoop);
@@ -349,11 +388,13 @@
     
     function goToMenu() {
         state.screen = 'menu';
+        state.countdownActive = false;
         document.getElementById('menu').classList.remove('hidden');
         document.getElementById('game').classList.remove('active');
         document.getElementById('gameOver').classList.remove('active');
         document.getElementById('victory').classList.remove('active');
         document.getElementById('controls').classList.remove('active');
+        document.getElementById('countdown').classList.remove('active');
     }
     
     function showChapter() {
@@ -364,6 +405,28 @@
     
     function hideChapter() {
         document.getElementById('chapterScreen').classList.remove('active');
+        startCountdown();
+    }
+    
+    function startCountdown() {
+        state.countdownActive = true;
+        const countdownEl = document.getElementById('countdown');
+        const numEl = document.getElementById('countdownNum');
+        countdownEl.classList.add('active');
+        
+        let count = 3;
+        numEl.textContent = count;
+        
+        const interval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                numEl.textContent = count;
+            } else {
+                clearInterval(interval);
+                countdownEl.classList.remove('active');
+                state.countdownActive = false;
+            }
+        }, 800);
     }
     
     function gameOver(msg) {
@@ -387,17 +450,30 @@
         const types = ['boogo', 'catstar', 'robot', 'rat', 'slime'];
         
         for (let i = 0; i < count; i++) {
+            let x, y;
+            let attempts = 0;
+            
+            // Spawnear LEJOS del jugador
+            do {
+                x = Math.random() * (W - 100) + 50;
+                y = Math.random() * (H - 100) + 50;
+                attempts++;
+            } while (
+                Math.sqrt(Math.pow(x - state.player.x, 2) + Math.pow(y - state.player.y, 2)) < DIFFICULTY.minSpawnDistance
+                && attempts < 50
+            );
+            
             state.enemies.push({
-                x: Math.random() * (W - 100) + 50,
-                y: Math.random() * (H - 100) + 50,
+                x: x,
+                y: y,
                 type: types[i % types.length],
-                speed: 1 + state.chapter * 0.2
+                speed: DIFFICULTY.enemySpeed + state.chapter * DIFFICULTY.speedPerChapter
             });
         }
     }
     
     function update() {
-        if (state.screen !== 'playing') return;
+        if (state.screen !== 'playing' || state.countdownActive) return;
         
         frame++;
         
@@ -411,7 +487,6 @@
         }
         
         // Teclado
-        const keys = {};
         if (keyState['KeyW'] || keyState['ArrowUp']) dy -= 1;
         if (keyState['KeyS'] || keyState['ArrowDown']) dy += 1;
         if (keyState['KeyA'] || keyState['ArrowLeft']) dx -= 1;
@@ -420,7 +495,7 @@
         const mag = Math.sqrt(dx*dx + dy*dy);
         if (mag > 0) { dx /= mag; dy /= mag; }
         
-        const speed = running ? 6 : 3;
+        const speed = running ? DIFFICULTY.playerSprint : DIFFICULTY.playerSpeed;
         state.player.x = Math.max(20, Math.min(W - 20, state.player.x + dx * speed));
         state.player.y = Math.max(20, Math.min(H - 20, state.player.y + dy * speed));
         
@@ -439,20 +514,20 @@
         state.enemies.forEach(e => {
             const dist = Math.sqrt(Math.pow(state.player.x - e.x, 2) + Math.pow(state.player.y - e.y, 2));
             
-            if (dist < 200 && state.player.light > 10) {
-                // Perseguir
+            // Solo perseguir si está en el radio de luz Y la luz es suficiente
+            if (dist < DIFFICULTY.lightRadius * (state.player.light / 100) && state.player.light > 10) {
                 const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
                 e.x += Math.cos(angle) * e.speed;
                 e.y += Math.sin(angle) * e.speed;
             } else {
-                // Patrullar
+                // Patrullar aleatoriamente
                 e.x += Math.cos(frame * 0.02 + e.speed) * 0.5;
                 e.y += Math.sin(frame * 0.02 + e.speed) * 0.5;
             }
             
-            // Colisión
-            if (dist < 30 && state.player.hp > 0) {
-                state.player.hp -= 5;
+            // Colisión - solo si está MUY cerca
+            if (dist < DIFFICULTY.collisionRadius && state.player.hp > 0) {
+                state.player.hp -= DIFFICULTY.damagePerHit;
                 if (state.player.hp <= 0) {
                     gameOver('¡Un enemigo te atrapó!');
                 }
@@ -521,11 +596,14 @@
         ctx.textAlign = 'center';
         ctx.fillText('🚪', state.exit.x, state.exit.y + 7);
         
+        // Radio de luz dinámico
+        const lightRadius = DIFFICULTY.lightRadius * (state.player.light / 100);
+        
         // Enemigos
-        const lightRadius = 200 * (state.player.light / 100);
         state.enemies.forEach(e => {
             const dist = Math.sqrt(Math.pow(state.player.x - e.x, 2) + Math.pow(state.player.y - e.y, 2));
             if (dist < lightRadius) {
+                // Cuerpo del enemigo
                 ctx.beginPath();
                 ctx.arc(e.x, e.y, 20, 0, Math.PI * 2);
                 ctx.fillStyle = e.type === 'boogo' ? '#4488ff' : 
@@ -533,10 +611,18 @@
                                  e.type === 'robot' ? '#888' : 
                                  e.type === 'rat' ? '#876' : '#8f8';
                 ctx.fill();
+                
+                // Ojos
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(e.x - 7, e.y - 5, 5, 0, Math.PI * 2);
+                ctx.arc(e.x + 7, e.y - 5, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
                 ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(e.x - 7, e.y - 5, 4, 0, Math.PI * 2);
-                ctx.arc(e.x + 7, e.y - 5, 4, 0, Math.PI * 2);
+                ctx.arc(e.x - 7, e.y - 5, 2, 0, Math.PI * 2);
+                ctx.arc(e.x + 7, e.y - 5, 2, 0, Math.PI * 2);
                 ctx.fill();
             }
         });
@@ -553,7 +639,10 @@
         // Linterna (círculo de luz)
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
-        const gradient = ctx.createRadialGradient(state.player.x, state.player.y, 0, state.player.x, state.player.y, lightRadius);
+        const gradient = ctx.createRadialGradient(
+            state.player.x, state.player.y, 0, 
+            state.player.x, state.player.y, lightRadius
+        );
         gradient.addColorStop(0, 'rgba(0,0,0,1)');
         gradient.addColorStop(0.7, 'rgba(0,0,0,0.8)');
         gradient.addColorStop(1, 'rgba(0,0,0,0)');
