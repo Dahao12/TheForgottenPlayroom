@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Forgotten Playroom</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/menu.css">
+</head>
+<body>
+    <!-- Main Menu -->
+    <div id="main-menu" class="menu-screen">
+        <div class="menu-content">
+            <h1 class="game-title">THE FORGOTTEN PLAYROOM</h1>
+            <p class="game-subtitle">Un juego de terror en una fábrica de juguetes abandonada</p>
+            
+            <div class="menu-buttons">
+                <button id="btn-play" class="menu-btn">🎯 JUGAR</button>
+                <button id="btn-chapters" class="menu-btn">📖 CAPÍTULOS</button>
+                <button id="btn-characters" class="menu-btn">👹 PERSONAJES</button>
+                <button id="btn-controls" class="menu-btn">🎮 CONTROLES</button>
+                <button id="btn-credits" class="menu-btn">📜 CRÉDITOS</button>
+            </div>
+            
+            <div class="warning-text">
+                ⚠️ Este juego contiene terror y sustos. Recomendado para mayores de 12 años.
+            </div>
+        </div>
+        
+        <div class="menu-background">
+            <div class="floating-toy toy-1">🧸</div>
+            <div class="floating-toy toy-2">🦁</div>
+            <div class="floating-toy toy-3">🤖</div>
+            <div class="floating-toy toy-4">🐀</div>
+            <div class="floating-toy toy-5">🟢</div>
+        </div>
+    </div>
+    
+    <!-- Chapters Menu -->
+    <div id="chapters-menu" class="menu-screen hidden">
+        <div class="menu-content">
+            <h2>📖 SELECCIONA CAPÍTULO</h2>
+            
+            <div class="chapter-list">
+                <div class="chapter-card unlocked" data-chapter="1">
+                    <div class="chapter-number">CAPÍTULO 1</div>
+                    <div class="chapter-title">LA ENTRADA</div>
+                    <div class="chapter-description">Explora la entrada de la fábrica abandonada</div>
+                    <div class="chapter-monsters">Monstruos: Boogo, Catstar</div>
+                </div>
+                
+                <div class="chapter-card unlocked" data-chapter="2">
+                    <div class="chapter-number">CAPÍTULO 2</div>
+                    <div class="chapter-title">EL ALMACÉN</div>
+                    <div class="chapter-description">Los pasillos oscuros del almacén de juguetes</div>
+                    <div class="chapter-monsters">Monstruos: 1028, Ratuile, Slimer</div>
+                </div>
+                
+                <div class="chapter-card unlocked" data-chapter="3">
+                    <div class="chapter-number">CAPÍTULO 3</div>
+                    <div class="chapter-title">EL LABORATORIO</div>
+                    <div class="chapter-description">Secretos oscuros en el laboratorio</div>
+                    <div class="chapter-monsters">Todos los monstruos</div>
+                </div>
+                
+                <div class="chapter-card unlocked" data-chapter="4">
+                    <div class="chapter-number">CAPÍTULO 4</div>
+                    <div class="chapter-title">LA SALA DE EMILY</div>
+                    <div class="chapter-description">Enfrenta a Emily en la batalla final</div>
+                    <div class="chapter-monsters">Boss: Emily</div>
+                </div>
+            </div>
+            
+            <button id="btn-back-chapters" class="menu-btn back-btn">⬅️ VOLVER</button>
+        </div>
+    </div>
+    
+    <!-- Characters Menu -->
+    <div id="characters-menu" class="menu-screen hidden">
+        <div class="menu-content">
+            <h2>👹 PERSONAJES</h2>
+            
+            <div class="character-grid">
+                <div class="character-card" data-character="boogo">
+                    <div class="character-emoji">🧸</div>
+                    <div class="character-name">BOOGO</div>
+                    <div class="character-type">Monstruo Capítulo 1</div>
+                    <div class="character-description">Peluche abandonado. Se teletransporta cuando no lo miras.</div>
+                </div>
+                
+                <div class="character-card" data-character="catstar">
+                    <div class="character-emoji">🦁</div>
+                    <div class="character-name">CATSTAR</div>
+                    <div class="character-type">Monstruo Capítulo 1</div>
+                    <div class="character-description">Gato animatrónico con melena de estrella. Ataca desde las alturas.</div>
+                </div>
+                
+                <div class="character-card" data-character="robot1028">
+                    <div class="character-emoji">🤖</div>
+                    <div class="character-name">1028</div>
+                    <div class="character-type">Monstruo Capítulo 2</div>
+                    <div class="character-description">Robot oxidado con pinzas de acero. ¡Traicionero! Finge ayudar.</div>
+                </div>
+                
+                <div class="character-card" data-character="ratuile">
+                    <div class="character-emoji">🐀</div>
+                    <div class="character-name">RATUILE</div>
+                    <div class="character-type">Monstruo Capítulo 2</div>
+                    <div class="character-description">Rata con 3 emociones: 😊 Feliz, 😟 Triste, 😠 Furioso. ¡Cuidado cuando está furioso!</div>
+                </div>
+                
+                <div class="character-card" data-character="slimer">
+                    <div class="character-emoji">🟢</div>
+                    <div class="character-name">SLIMER</div>
+                    <div class="character-type">Monstruo Capítulo 2</div>
+                    <div class="character-description">Slime con sombrero. Deja rastro viscoso que te ralentiza.</div>
+                </div>
+                
+                <div class="character-card ally" data-character="tecnoplayer">
+                    <div class="character-emoji">📺</div>
+                    <div class="character-name">TECNO PLAYER</div>
+                    <div class="character-type">Aliado Capítulo 2</div>
+                    <div class="character-description">Robot con cabeza de TV. ¡Tu amigo! Te guía y hackea puertas.</div>
+                </div>
+                
+                <div class="character-card boss" data-character="emily">
+                    <div class="character-emoji">👧</div>
+                    <div class="character-name">EMILY</div>
+                    <div class="character-type">Boss Final Capítulo 4</div>
+                    <div class="character-description">La niña fantasma. Controla todos los monstruos. ¡El verdadero villano!</div>
+                </div>
+                
+                <div class="character-card player" data-character="player">
+                    <div class="character-emoji">👤</div>
+                    <div class="character-name">TÚ</div>
+                    <div class="character-type">Jugador</div>
+                    <div class="character-description">Investigador en la fábrica abandonada. Solo tienes una linterna...</div>
+                </div>
+            </div>
+            
+            <button id="btn-back-characters" class="menu-btn back-btn">⬅️ VOLVER</button>
+        </div>
+    </div>
+    
+    <!-- Controls Menu -->
+    <div id="controls-menu" class="menu-screen hidden">
+        <div class="menu-content">
+            <h2>🎮 CONTROLES</h2>
+            
+            <div class="controls-list">
+                <div class="control-item">
+                    <span class="control-key">W A S D</span>
+                    <span class="control-action">Mover personaje</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">↑ ← ↓ →</span>
+                    <span class="control-action">Mover personaje (alternativo)</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">F</span>
+                    <span class="control-action">Encender/Apagar linterna</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">E</span>
+                    <span class="control-action">Interactuar con objetos</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">SPACE</span>
+                    <span class="control-action">Correr (gasta stamina)</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">ESC</span>
+                    <span class="control-action">Pausar juego</span>
+                </div>
+                <div class="control-item">
+                    <span class="control-key">CLICK</span>
+                    <span class="control-action">Apuntar linterna</span>
+                </div>
+            </div>
+            
+            <div class="tips">
+                <h3>💡 CONSEJOS</h3>
+                <ul>
+                    <li>Mantén tu linterna encendida para ver en la oscuridad</li>
+                    <li>No mires directamente a Boogo - se teletransporta</li>
+                    <li>Corre cuando los ojos de 1028 se pongan rojos</li>
+                    <li>Ratuile solo ataca cuando está 😠 FURIOSO</li>
+                    <li>Evita el rastro de Slimer - te ralentiza</li>
+                    <li>Confía en Tecno Player - es tu aliado</li>
+                    <li>Emily miente - no confíes en ella</li>
+                </ul>
+            </div>
+            
+            <button id="btn-back-controls" class="menu-btn back-btn">⬅️ VOLVER</button>
+        </div>
+    </div>
+    
+    <!-- Credits Menu -->
+    <div id="credits-menu" class="menu-screen hidden">
+        <div class="menu-content">
+            <h2>📜 CRÉDITOS</h2>
+            
+            <div class="credits-content">
+                <div class="credit-section">
+                    <h3>🎮 DESARROLLO</h3>
+                    <p>Juego creado con HTML5 Canvas y JavaScript</p>
+                    <p>Desarrollado para navegadores web</p>
+                </div>
+                
+                <div class="credit-section">
+                    <h3>📖 HISTORIA</h3>
+                    <p>Una fábrica de juguetes abandonada desde 1952</p>
+                    <p>Juguetes que cobran vida de forma siniestra</p>
+                    <p>Emily, la niña fantasma que controla todo</p>
+                </div>
+                
+                <div class="credit-section">
+                    <h3>👹 PERSONAJES</h3>
+                    <p>Boogo - El peluche abandonado</p>
+                    <p>Catstar - El gato animatrónico</p>
+                    <p>1028 - El robot traidor</p>
+                    <p>Ratuile - La rata emocional</p>
+                    <p>Slimer - El slime con sombrero</p>
+                    <p>Tecno Player - El robot aliado</p>
+                    <p>Emily - La villana final</p>
+                </div>
+                
+                <div class="credit-section">
+                    <h3>🌐 REPOSITORIO</h3>
+                    <p>github.com/TheForgottenPlayroom/TheForgottenPlayroom</p>
+                </div>
+            </div>
+            
+            <button id="btn-back-credits" class="menu-btn back-btn">⬅️ VOLVER</button>
+        </div>
+    </div>
+    
+    <!-- Pause Menu -->
+    <div id="pause-menu" class="menu-screen hidden">
+        <div class="menu-content">
+            <h2>⏸️ PAUSA</h2>
+            
+            <div class="pause-buttons">
+                <button id="btn-resume" class="menu-btn">▶️ CONTINUAR</button>
+                <button id="btn-restart" class="menu-btn">🔄 REINICIAR</button>
+                <button id="btn-main-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Game Over Screen -->
+    <div id="game-over" class="menu-screen hidden">
+        <div class="menu-content game-over-content">
+            <h2>💀 GAME OVER</h2>
+            <p id="death-message">Has sido atrapado...</p>
+            <p id="death-monster"></p>
+            
+            <div class="game-over-buttons">
+                <button id="btn-retry" class="menu-btn">🔄 REINTENTAR</button>
+                <button id="btn-game-over-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Victory Screen -->
+    <div id="victory-screen" class="menu-screen hidden">
+        <div class="menu-content victory-content">
+            <h2>🎉 ¡VICTORIA!</h2>
+            <p>¡Has escapado de The Forgotten Playroom!</p>
+            <p>Has derrotado a Emily y todos los monstruos.</p>
+            
+            <div class="stats">
+                <p>Tiempo: <span id="victory-time">00:00</span></p>
+                <p>Capítulo completado: <span id="victory-chapter">4</span></p>
+            </div>
+            
+            <button id="btn-victory-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
+        </div>
+    </div>
+    
+    <!-- Game Container -->
+    <div id="game-container" class="hidden">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- HUD -->
+        <div id="hud">
+            <div id="hud-health">
+                <span class="hud-label">❤️ Vida</span>
+                <div class="health-bar">
+                    <div id="health-fill" class="health-fill"></div>
+                </div>
+            </div>
+            
+            <div id="hud-stamina">
+                <span class="hud-label">⚡ Stamina</span>
+                <div class="stamina-bar">
+                    <div id="stamina-fill" class="stamina-fill"></div>
+                </div>
+            </div>
+            
+            <div id="hud-flashlight">
+                <span class="hud-label">🔦 Batería</span>
+                <div class="battery-bar">
+                    <div id="battery-fill" class="battery-fill"></div>
+                </div>
+            </div>
+            
+            <div id="hud-chapter">
+                <span id="chapter-name">Capítulo 1: La Entrada</span>
+            </div>
+            
+            <div id="hud-timer">
+                <span id="game-timer">00:00</span>
+            </div>
+        </div>
+        
+        <!-- Interaction Prompt -->
+        <div id="interaction-prompt" class="hidden">
+            <span id="prompt-text">Presiona E para interactuar</span>
+        </div>
+        
+        <!-- Dialog Box -->
+        <div id="dialog-box" class="hidden">
+            <div id="dialog-character"></div>
+            <div id="dialog-text"></div>
+            <div id="dialog-continue">Click para continuar...</div>
+        </div>
+        
+        <!-- Inventory -->
+        <div id="inventory" class="hidden">
+            <h3>Inventario</h3>
+            <div id="inventory-items"></div>
+        </div>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="hidden">
+        <div class="loading-content">
+            <h2>Cargando...</h2>
+            <div class="loading-bar">
+                <div id="loading-progress" class="loading-progress"></div>
+            </div>
+            <p id="loading-text">Preparando el horror...</p>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/constants.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/characters/enemy.js"></script>
+    <script src="js/characters/boogo.js"></script>
+    <script src="js/characters/catstar.js"></script>
+    <script src="js/characters/robot1028.js"></script>
+    <script src="js/characters/ratuile.js"></script>
+    <script src="js/characters/slimer.js"></script>
+    <script src="js/characters/tecnoplayer.js"></script>
+    <script src="js/characters/emily.js"></script>
+    <script src="js/levels/level.js"></script>
+    <script src="js/levels/chapter1.js"></script>
+    <script src="js/levels/chapter2.js"></script>
+    <script src="js/levels/chapter3.js"></script>
+    <script src="js/levels/chapter4.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
