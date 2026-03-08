@@ -334,9 +334,9 @@
         <div id="chapterInfo" style="pointer-events: none;">CAPÍTULO 1</div>
         <div id="joystickArea"><div class="joystick-outer" id="joystickOuter"><div class="joystick-inner" id="joystickInner"></div></div></div>
         <div id="touchActions">
-            <button class="action-btn" id="btnRun">▶</button>
-            <button class="action-btn action-btngrab" id="btnGrab">🔌</button>
-            <button class="action-btn" id="btnPause">❚❚</button>
+            <button class="action-btn" id="btnRun" ontouchstart="window.touchRun(true,this)" ontouchend="window.touchRun(false,this)" onpointerdown="window.touchRun(true,this)" onpointerup="window.touchRun(false,this)">▶</button>
+            <button class="action-btn action-btngrab" id="btnGrab" ontouchstart="window.touchGrab(this)" onpointerdown="window.touchGrab(this)">🔌</button>
+            <button class="action-btn" id="btnPause" ontouchstart="window.touchPause(this)" onpointerdown="window.touchPause(this)">❚❚</button>
         </div>
     </div>
     
@@ -393,6 +393,29 @@
     let keys = {}, joystick = { x: 0, y: 0 }, running = false, usingGrab = false;
     let invincible = false, invincibleTime = 0, frame = 0;
     let lightFlicker = 1, particles = [];
+    
+    // FUNCIONES GLOBALES PARA BOTONES TÁCTILES
+    window.touchRun = (active, btn) => {
+        if (!btn) return;
+        running = active;
+        if (active) btn.classList.add('pressed');
+        else btn.classList.remove('pressed');
+    };
+    
+    window.touchGrab = (btn) => {
+        if (!btn) return;
+        btn.classList.add('pressed');
+        useGrabPack();
+        setTimeout(() => btn.classList.remove('pressed'), 200);
+    };
+    
+    window.touchPause = (btn) => {
+        if (!btn) return;
+        btn.classList.add('pressed');
+        setTimeout(() => btn.classList.remove('pressed'), 100);
+        if (state === 'playing') pauseGame();
+        else if (state === 'paused') resumeGame();
+    };
     
     // AUDIO
     let audioCtx = null;
