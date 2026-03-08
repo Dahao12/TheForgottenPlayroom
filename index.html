@@ -6,20 +6,11 @@
     <title>The Forgotten Playroom</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; touch-action: manipulation; }
-        html, body {
-            width: 100%; height: 100%;
-            overflow: hidden;
-            background: #000;
+        body {
+            background: #0a0008;
+            font-family: Arial, sans-serif;
+            color: #fff;
             touch-action: none;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        button {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
         }
         
         /* MENÚ */
@@ -32,145 +23,93 @@
         }
         #menu.hidden { display: none; }
         
-        .btn {
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
         .title {
-            font-size: clamp(2rem, 6vw, 4rem);
+            font-size: clamp(2rem, 8vw, 4rem);
             color: #ff2244;
-            text-shadow: 0 0 10px #ff0022, 0 0 30px #ff002266;
+            text-shadow: 0 0 20px #ff0022;
             text-align: center;
-            font-family: 'Impact', sans-serif;
-            letter-spacing: 3px;
             margin-bottom: 20px;
-            animation: flicker 4s infinite;
-        }
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            92% { opacity: 1; }
-            93% { opacity: 0.8; }
-            94% { opacity: 1; }
-            96% { opacity: 0.9; }
-            97% { opacity: 1; }
         }
         
-        .subtitle { color: #666; margin-bottom: 40px; font-size: 1rem; text-align: center; }
+        .subtitle { color: #666; margin-bottom: 40px; text-align: center; padding: 0 20px; }
         
         .btn {
-            padding: 15px 60px; margin: 10px;
+            padding: 20px 50px;
+            margin: 10px;
             background: linear-gradient(180deg, #2a1525, #1a0a15);
             border: 2px solid #ff2244;
-            color: #fff; font-size: 1.1rem;
-            border-radius: 5px;
-            cursor: pointer; min-width: 200px;
-            text-transform: uppercase; letter-spacing: 2px;
-            transition: all 0.3s;
+            color: #fff;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            min-width: 220px;
             text-decoration: none;
             display: inline-block;
             text-align: center;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
         }
-        .btn:active, .btn:hover { background: #ff2244; box-shadow: 0 0 30px #ff002266; }
+        .btn:active { background: #ff2244; transform: scale(0.95); }
         
         /* JUEGO */
         #game { display: none; }
         #game.active { display: block; }
-        #canvas { width: 100%; height: 100%; display: block; }
+        
+        canvas { width: 100%; height: 100vh; display: block; touch-action: none; }
         
         /* HUD */
         #hud {
-            position: fixed; top: 15px; left: 15px;
-            display: flex; flex-direction: column; gap: 8px;
-            z-index: 10;
+            position: fixed; top: 10px; left: 10px;
+            display: flex; flex-direction: column; gap: 5px;
+            z-index: 10; pointer-events: none;
         }
-        .stat { 
+        .stat {
             display: flex; align-items: center; gap: 8px;
-            background: rgba(10,0,5,0.9);
-            padding: 6px 12px; border-radius: 4px;
-            border-left: 3px solid;
+            background: rgba(0,0,0,0.8);
+            padding: 8px 12px; border-radius: 4px;
         }
-        .stat.health { border-color: #ff2244; }
-        .stat.stamina { border-color: #22aaff; }
-        .stat.light { border-color: #ffaa22; }
-        .stat-fill { width: 120px; height: 10px; background: #1a0a15; border-radius: 2px; overflow: hidden; }
-        .stat-inner { height: 100%; transition: width 0.2s; }
-        #healthFill { background: linear-gradient(90deg, #ff2244, #ff6688); }
-        #staminaFill { background: linear-gradient(90deg, #22aaff, #66ccff); }
-        #lightFill { background: linear-gradient(90deg, #ffaa22, #ffcc66); }
-        
-        /* GrabPack indicator */
-        #grabpack {
-            position: fixed; bottom: 15px; left: 15px;
-            background: rgba(10,0,5,0.9);
-            padding: 8px 15px; border-radius: 4px;
-            border: 1px solid #ff2244;
-            color: #ff6688; font-size: 0.9rem;
-            z-index: 10;
-        }
-        #grabpack.ready { border-color: #22ff66; color: #22ff66; }
-        
-        #chapterInfo {
-            position: fixed; top: 15px; right: 15px;
-            background: rgba(10,0,5,0.9);
-            padding: 10px 20px; border-radius: 4px;
-            border: 1px solid #ff2244;
-            color: #ff6688; font-family: 'Courier New', monospace;
-            font-size: 0.9rem; z-index: 10;
-        }
+        .bar { width: 100px; height: 8px; background: #333; border-radius: 4px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.3s; }
+        #healthBar .bar-fill { background: linear-gradient(90deg, #ff2244, #ff6688); }
+        #staminaBar .bar-fill { background: linear-gradient(90deg, #22aaff, #66ccff); }
+        #lightBar .bar-fill { background: linear-gradient(90deg, #ffaa22, #ffcc66); }
         
         /* CONTROLES MÓVIL */
-        #joystickArea {
-            position: fixed; bottom: 25px; left: 25px;
-            width: 130px; height: 130px;
-            z-index: 1000; display: none;
-            touch-action: none;
-        }
-        #joystickArea.active { display: block; }
-        .joystick-outer {
-            width: 130px; height: 130px;
-            background: rgba(10,0,5,0.9);
-            border: 3px solid rgba(255,34,68,0.7);
-            border-radius: 50%; position: relative;
-            touch-action: none;
-        }
-        .joystick-inner {
-            width: 55px; height: 55px;
-            background: linear-gradient(180deg, #ff2244, #aa0022);
-            border-radius: 50%; position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 4px 15px rgba(255,0,22,0.5);
+        #controls {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            display: none; z-index: 100;
             pointer-events: none;
         }
+        #controls.active { display: flex; justify-content: space-between; align-items: flex-end; }
         
-        #touchActions {
-            position: fixed; bottom: 25px; right: 25px;
-            z-index: 1000; display: none; gap: 12px;
+        #joystick {
+            width: 120px; height: 120px;
+            background: rgba(0,0,0,0.6);
+            border: 3px solid rgba(255,34,68,0.5);
+            border-radius: 50%;
+            position: relative;
+            pointer-events: auto;
         }
-        #touchActions.active { display: flex; }
-        .action-btn {
-            width: 70px; height: 70px;
-            background: linear-gradient(180deg, #2a1525, #1a0a15);
-            border: 3px solid #ff2244;
-            border-radius: 50%; color: #fff;
-            font-size: 24px; display: flex;
-            align-items: center; justify-content: center;
-            cursor: pointer;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+        #joystick-knob {
+            width: 50px; height: 50px;
+            background: linear-gradient(180deg, #ff2244, #aa0022);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
         }
-        .action-btn:active, .action-btn.pressed { 
-            background: #ff2244 !important; 
-            transform: scale(0.9); 
+        
+        #buttons { display: flex; gap: 10px; pointer-events: auto; }
+        .game-btn {
+            width: 60px; height: 60px;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #ff2244;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
         }
-        .action-btngrab { border-color: #22aaff; }
-        .action-btngrab:active, .action-btngrab.pressed { 
-            background: #22aaff !important; 
-        }
+        .game-btn:active { background: #ff2244; }
+        #btnGrab { border-color: #22aaff; }
+        #btnGrab:active { background: #22aaff; }
         
         /* OVERLAYS */
         .overlay {
@@ -178,778 +117,139 @@
             background: rgba(0,0,0,0.95);
             display: none; flex-direction: column;
             align-items: center; justify-content: center;
-            z-index: 80; padding: 20px;
+            z-index: 200; padding: 20px;
         }
         .overlay.active { display: flex; }
-        .overlay h1 { font-size: clamp(2rem, 8vw, 4rem); margin-bottom: 20px; text-transform: uppercase; }
-        .overlay p { color: #888; margin-bottom: 30px; text-align: center; }
-        .overlay h3 { color: #ff6688; margin: 20px 0 10px; }
-        #gameOver h1 { color: #ff2244; text-shadow: 0 0 30px #ff0022; }
-        #victory h1 { color: #22ff66; text-shadow: 0 0 30px #22ff44; }
-        #pause h1 { color: #ffaa22; }
+        .overlay h1 { color: #ff2244; font-size: 2rem; margin-bottom: 20px; }
+        .overlay p { color: #888; margin-bottom: 20px; text-align: center; }
         
         #chapterScreen {
-            position: fixed; inset: 0; background: #000;
+            position: fixed; inset: 0;
+            background: #000;
             display: none; flex-direction: column;
             align-items: center; justify-content: center;
-            z-index: 90;
+            z-index: 150;
         }
         #chapterScreen.active { display: flex; }
-        #chapterScreen h1 { color: #ff2244; font-size: clamp(2rem, 6vw, 3.5rem); text-shadow: 0 0 30px #ff0022; }
-        #chapterScreen h2 { color: #888; font-size: clamp(1rem, 4vw, 1.8rem); margin-top: 10px; }
-        #chapterScreen p { color: #444; margin-top: 40px; }
-        
-        .info-screen { max-width: 90%; width: 380px; padding: 20px; }
-        .char-box { 
-            display: flex; align-items: center; gap: 15px; 
-            padding: 12px; margin: 8px 0;
-            background: rgba(255,255,255,0.03);
-            border-radius: 8px; border-left: 4px solid;
-        }
-        .char-box.enemy { border-color: #ff2244; }
-        .char-box.ally { border-color: #22ff66; }
-        .char-preview { width: 50px; height: 50px; border-radius: 4px; }
-        .char-info h4 { color: #ff6688; font-size: 1rem; margin-bottom: 4px; }
-        .char-info p { color: #888; font-size: 0.8rem; }
-        
-        /* VHS Overlay */
-        #vhsOverlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.95);
-            display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 100;
-        }
-        #vhsOverlay.active { display: flex; }
-        .vhs-content {
-            max-width: 500px; padding: 30px;
-            background: #0a0008;
-            border: 2px solid #ff2244;
-            border-radius: 10px;
-            text-align: left;
-        }
-        .vhs-title { color: #ff2244; font-size: 1.5rem; margin-bottom: 20px; }
-        .vhs-text { color: #aaa; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.6; }
-        
-        /* Puzzle Overlay */
-        #puzzleOverlay {
-            position: fixed; inset: 0;
-            background: rgba(0,0,0,0.9);
-            display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 95;
-        }
-        #puzzleOverlay.active { display: flex; }
-        #puzzleCanvas { border: 3px solid #ff2244; }
-        
-        /* Flicker effect */
-        @keyframes lightFlicker {
-            0%, 100% { opacity: 1; }
-            41% { opacity: 1; }
-            42% { opacity: 0.8; }
-            43% { opacity: 1; }
-            45% { opacity: 0.3; }
-            46% { opacity: 1; }
-            50% { opacity: 1; }
-            51% { opacity: 0.6; }
-            52% { opacity: 1; }
-        }
+        #chapterScreen h1 { color: #ff2244; font-size: 2.5rem; }
+        #chapterScreen h2 { color: #888; font-size: 1.5rem; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <script>
-    // FUNCIONES GLOBALES - DEFINIDAS PRIMERO
-    window.startGame = function() {
-        console.log('startGame called');
-        if (typeof _startGame === 'function') _startGame();
-        else alert('Cargando juego... Por favor espera.');
-    };
-    window.showOverlay = function(id) { 
-        console.log('showOverlay:', id);
-        if (typeof _showOverlay === 'function') _showOverlay(id);
-        else { var el = document.getElementById(id); if (el) el.classList.add('active'); }
-    };
-    window.hideOverlay = function(id) { 
-        console.log('hideOverlay:', id);
-        if (typeof _hideOverlay === 'function') _hideOverlay(id);
-        else { var el = document.getElementById(id); if (el) el.classList.remove('active'); }
-    };
-    window.resumeGame = function() { if (typeof _resumeGame === 'function') _resumeGame(); };
-    window.quitGame = function() { if (typeof _quitGame === 'function') _quitGame(); };
-    window.closeVHS = function() { if (typeof _closeVHS === 'function') _closeVHS(); };
-    window.closePuzzle = function() { if (typeof _closePuzzle === 'function') _closePuzzle(); };
-    </script>
-    
     <!-- MENÚ -->
     <div id="menu">
         <h1 class="title">THE FORGOTTEN<br>PLAYROOM</h1>
         <p class="subtitle">Una fábrica abandonada... juguetes olvidados... terror</p>
-        <a class="btn" href="javascript:void(0)" onclick="window.startGame(); return false;">▶ JUGAR</a>
-        <a class="btn" href="javascript:void(0)" onclick="window.showOverlay('charsScreen'); return false;">PERSONAJES</a>
-        <a class="btn" href="javascript:void(0)" onclick="window.showOverlay('controlsScreen'); return false;">CONTROLES</a>
+        <button class="btn" id="playBtn">▶ JUGAR</button>
         <p style="color:#ff2244; margin-top:30px; font-size:0.8rem;">⚠️ Terror psicológico - Mayores de 12</p>
-    </div>
-    
-    <!-- PERSONAJES -->
-    <div id="charsScreen" class="overlay">
-        <h1 style="color:#ff2244;">PERSONAJES</h1>
-        <div class="info-screen">
-            <h3 style="color:#22ff66;">🟢 ALIADOS</h3>
-            <div class="char-box ally">
-                <canvas class="char-preview" id="previewPlayer" width="50" height="50"></canvas>
-                <div class="char-info"><h4>EL DETECTIVE (Tú)</h4><p>Ex-empleado con GrabPack</p></div>
-            </div>
-            <div class="char-box ally">
-                <canvas class="char-preview" id="previewTecno" width="50" height="50"></canvas>
-                <div class="char-info"><h4>TECNO PLAYER</h4><p>Robot aliado con pantalla TV</p></div>
-            </div>
-            
-            <h3 style="color:#ff2244; margin:20px 0;">🔴 ENEMIGOS</h3>
-            <div class="char-box enemy">
-                <canvas class="char-preview" id="previewBoogo" width="50" height="50"></canvas>
-                <div class="char-info"><h4>BOOGO</h4><p>Peluche azul con boca mortal</p></div>
-            </div>
-            <div class="char-box enemy">
-                <canvas class="char-preview" id="previewCatstar" width="50" height="50"></canvas>
-                <div class="char-info"><h4>CATSTAR</h4><p>León con garras de metal</p></div>
-            </div>
-            <div class="char-box enemy">
-                <canvas class="char-preview" id="preview1028" width="50" height="50"></canvas>
-                <div class="char-info"><h4>1028</h4><p>Robot traicionero con sierra</p></div>
-            </div>
-            <div class="char-box enemy">
-                <canvas class="char-preview" id="previewRatuile" width="50" height="50"></canvas>
-                <div class="char-info"><h4>RATUILE</h4><p>Rata con 3 estados de ánimo</p></div>
-            </div>
-            <div class="char-box enemy">
-                <canvas class="char-preview" id="previewSlimer" width="50" height="50"></canvas>
-                <div class="char-info"><h4>SLIMER</h4><p>Masa verde que ralentiza</p></div>
-            </div>
-            <div class="char-box enemy" style="border-color:#ff0000; background:rgba(255,0,0,0.1);">
-                <canvas class="char-preview" id="previewEmily" width="50" height="50"></canvas>
-                <div class="char-info"><h4>EMILY (BOSS)</h4><p>Muñeca de porcelana - Final</p></div>
-            </div>
-        </div>
-        <a class="btn" href="javascript:void(0)" onclick="window.hideOverlay('charsScreen'); return false;">CERRAR</a>
-    </div>
-    
-    <!-- CONTROLES -->
-    <div id="controlsScreen" class="overlay">
-        <h1 style="color:#ffaa22;">CONTROLES</h1>
-        <div class="info-screen">
-            <h3 style="color:#ff6688;">🎮 MECÁNICAS</h3>
-            <p><strong>GrabPack (E):</strong> Brazo extensible para activar interruptores</p>
-            <p><strong>Linterna:</strong> Se agota con el tiempo</p>
-            <p><strong>Pilas:</strong> Baterías para recargar linterna</p>
-            <p><strong>Cintas VHS:</strong> Historia del juego</p>
-            
-            <h3 style="color:#ff6688; margin-top:20px;">📱 MÓVIL</h3>
-            <p>Joystick: Mover</p>
-            <p>Botón ▶ : Correr</p>
-            <p>Botón 🔌 : GrabPack</p>
-            
-            <h3 style="color:#ff6688; margin-top:20px;">💻 PC</h3>
-            <p>WASD: Mover | Shift: Correr</p>
-            <p>E: Usar GrabPack | ESC: Pausar</p>
-        </div>
-        <a class="btn" href="javascript:void(0)" onclick="window.hideOverlay('controlsScreen'); return false;">CERRAR</a>
     </div>
     
     <!-- JUEGO -->
     <div id="game">
-        <canvas id="canvas" style="touch-action: none;"></canvas>
-        <div id="hud" style="pointer-events: none;">
-            <div class="stat health"><span>❤️</span><div class="stat-fill"><div class="stat-inner" id="healthFill"></div></div></div>
-            <div class="stat stamina"><span>⚡</span><div class="stat-fill"><div class="stat-inner" id="staminaFill"></div></div></div>
-            <div class="stat light"><span>🔦</span><div class="stat-fill"><div class="stat-inner" id="lightFill"></div></div></div>
+        <canvas id="canvas"></canvas>
+        <div id="hud">
+            <div class="stat"><span>❤️</span><div class="bar" id="healthBar"><div class="bar-fill" id="healthFill"></div></div></div>
+            <div class="stat"><span>⚡</span><div class="bar" id="staminaBar"><div class="bar-fill" id="staminaFill"></div></div></div>
+            <div class="stat"><span>🔦</span><div class="bar" id="lightBar"><div class="bar-fill" id="lightFill"></div></div></div>
         </div>
-        <div id="grabpack" style="pointer-events: none;">🔌 GrabPack: E</div>
-        <div id="chapterInfo" style="pointer-events: none;">CAPÍTULO 1</div>
-        <div id="joystickArea"><div class="joystick-outer" id="joystickOuter"><div class="joystick-inner" id="joystickInner"></div></div></div>
-        <div id="touchActions">
-            <a class="action-btn" id="btnRun" href="javascript:void(0)">▶</a>
-            <a class="action-btn action-btngrab" id="btnGrab" href="javascript:void(0)">🔌</a>
-            <a class="action-btn" id="btnPause" href="javascript:void(0)">❚❚</a>
-        </div>
-    </div>
-    
-    <!-- CAPÍTULO -->
-    <div id="chapterScreen"><h1 id="chapTitle">CAPÍTULO 1</h1><h2 id="chapSub">La Entrada</h2><p>Toca para continuar...</p></div>
-    
-    <!-- VHS -->
-    <div id="vhsOverlay">
-        <div class="vhs-content">
-            <div class="vhs-title" id="vhsTitle">📼 CINTA VHS</div>
-            <div class="vhs-text" id="vhsText"></div>
-            <a class="btn" style="margin-top:20px; display:inline-block;" href="javascript:void(0)" onclick="window.closeVHS(); return false;">CONTINUAR</a>
+        <div id="controls">
+            <div id="joystick"><div id="joystick-knob"></div></div>
+            <div id="buttons">
+                <button class="game-btn" id="btnRun">▶</button>
+                <button class="game-btn" id="btnGrab">🔌</button>
+            </div>
         </div>
     </div>
     
-    <!-- PUZZLE -->
-    <div id="puzzleOverlay">
-        <h2 style="color:#ff2244; margin-bottom:20px;">🔌 PUZZLE ELÉCTRICO</h2>
-        <canvas id="puzzleCanvas" width="400" height="300"></canvas>
-        <p style="color:#888; margin-top:15px;">Conecta los cables del mismo color</p>
-        <a class="btn" style="margin-top:10px; display:inline-block;" href="javascript:void(0)" onclick="window.closePuzzle(); return false;">CERRAR</a>
+    <!-- CHAPTER SCREEN -->
+    <div id="chapterScreen">
+        <h1 id="chapTitle">CAPÍTULO 1</h1>
+        <h2 id="chapSub">La Entrada</h2>
+        <p style="color:#666; margin-top:30px;">Toca para comenzar</p>
     </div>
     
-    <!-- OTROS -->
-    <div id="pause" class="overlay"><h1>PAUSA</h1><p>El juego está pausado</p><a class="btn" href="javascript:void(0)" onclick="window.resumeGame(); return false;">▶ CONTINUAR</a><a class="btn" href="javascript:void(0)" onclick="window.quitGame(); return false;">🏠 MENÚ</a></div>
-    <div id="gameOver" class="overlay"><h1>GAME OVER</h1><p id="deathMsg">Te atraparon...</p><a class="btn" href="javascript:void(0)" onclick="window.startGame(); return false;">🔄 REINTENTAR</a><a class="btn" href="javascript:void(0)" onclick="window.quitGame(); return false;">🏠 MENÚ</a></div>
-    <div id="victory" class="overlay"><h1>¡ESCAPASTE!</h1><p>Sobreviviste a The Forgotten Playroom</p><a class="btn" href="javascript:void(0)" onclick="window.startGame(); return false;">🔄 JUGAR DE NUEVO</a><a class="btn" href="javascript:void(0)" onclick="window.quitGame(); return false;">🏠 MENÚ</a></div>
+    <!-- GAME OVER -->
+    <div id="gameOver" class="overlay">
+        <h1>GAME OVER</h1>
+        <p id="deathMsg">Te atraparon...</p>
+        <button class="btn" id="retryBtn">🔄 REINTENTAR</button>
+        <button class="btn" id="menuBtn">🏠 MENÚ</button>
+    </div>
+    
+    <!-- VICTORY -->
+    <div id="victory" class="overlay">
+        <h1 style="color:#22ff66;">¡ESCAPASTE!</h1>
+        <p>Sobreviviste a The Forgotten Playroom</p>
+        <button class="btn" id="playAgainBtn">🔄 JUGAR DE NUEVO</button>
+        <button class="btn" id="menuBtn2">🏠 MENÚ</button>
+    </div>
 
     <script>
-    // ============================================
-    // THE FORGOTTEN PLAYROOM - COMPLETE EDITION
-    // ============================================
+    // ========================================
+    // THE FORGOTTEN PLAYROOM - SIMPLIFIED
+    // ========================================
     
-    const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) || ('ontouchstart' in window);
-    
-    // CONFIG
-    const CONFIG = {
-        PLAYER_SPEED: 4,
-        PLAYER_RUN_SPEED: 7,
-        PLAYER_SIZE: 18,
-        ENEMY_SPEED: 1.2,
-        ENEMY_DAMAGE: 8,
-        SAFE_DIST: 350,
-        LIGHT_RADIUS: 320,
-        MIN_LIGHT: 100,
-        CHAPTERS: ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily']
+    // Estado del juego - INICIALIZADO PRIMERO
+    const state = {
+        screen: 'menu',
+        chapter: 1,
+        player: { x: 0, y: 0, hp: 100, stamina: 100, light: 100 },
+        enemies: [],
+        exit: { x: 0, y: 0 }
     };
     
-    // GLOBALS
+    // Referencias DOM
     let canvas, ctx, W, H;
-    let state = 'menu', chapter = 1;
-    let player = null, enemies = [], exitZone = null;
-    let items = [], switches = [], vhsTapes = [];
-    let keys = {}, joystick = { x: 0, y: 0 }, running = false, usingGrab = false;
-    let invincible = false, invincibleTime = 0, frame = 0;
-    let lightFlicker = 1, particles = [];
+    let joystickData = { x: 0, y: 0, active: false };
+    let running = false;
+    let frame = 0;
     
-    // FUNCIONES GLOBALES PARA BOTONES TÁCTILES
-    window.touchRun = (active, btn) => {
-        if (!btn) return;
-        running = active;
-        if (active) btn.classList.add('pressed');
-        else btn.classList.remove('pressed');
-    };
+    // Constantes
+    const IS_MOBILE = 'ontouchstart' in window || navigator.userAgent.includes('Mobile');
+    const CHAPTERS = ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily'];
     
-    window.touchGrab = (btn) => {
-        if (!btn) return;
-        btn.classList.add('pressed');
-        useGrabPack();
-        setTimeout(() => btn.classList.remove('pressed'), 200);
-    };
+    // ========================================
+    // INICIALIZACIÓN
+    // ========================================
     
-    window.touchPause = (btn) => {
-        if (!btn) return;
-        btn.classList.add('pressed');
-        setTimeout(() => btn.classList.remove('pressed'), 100);
-        if (state === 'playing') pauseGame();
-        else if (state === 'paused') resumeGame();
-    };
-    
-    // Funciones globales del menú
-    window.startGame = startGame;
-    window.showChars = () => showOverlay('charsScreen');
-    window.showControls = () => showOverlay('controlsScreen');
-    
-    // AUDIO
-    let audioCtx = null;
-    function playSound(type) {
-        if (!audioCtx) try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return; }
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        switch(type) {
-            case 'pickup':
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-                break;
-            case 'damage':
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
-                break;
-            case 'switch':
-                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-                break;
-            case 'ambient':
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(60, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
-                break;
-        }
-    }
-    
-    // SPRITES
-    const Sprites = {
-        drawPlayer(ctx, x, y, size, frame) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            // Cuerpo
-            ctx.fillStyle = '#334455';
-            ctx.beginPath();
-            ctx.ellipse(0, 5, size * 0.8, size, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Cabeza
-            ctx.fillStyle = '#ddbb99';
-            ctx.beginPath();
-            ctx.arc(0, -size * 0.6, size * 0.5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Pelo
-            ctx.fillStyle = '#332211';
-            ctx.beginPath();
-            ctx.ellipse(0, -size * 0.8, size * 0.5, size * 0.3, 0, 0, Math.PI);
-            ctx.fill();
-            
-            // Ojos
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(-size * 0.15, -size * 0.6, size * 0.12, 0, Math.PI * 2);
-            ctx.arc(size * 0.15, -size * 0.6, size * 0.12, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#2255aa';
-            ctx.beginPath();
-            ctx.arc(-size * 0.15, -size * 0.55, size * 0.06, 0, Math.PI * 2);
-            ctx.arc(size * 0.15, -size * 0.55, size * 0.06, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // GrabPack en la espalda
-            ctx.fillStyle = '#ff6644';
-            ctx.fillRect(-size * 0.6, -size * 0.2, size * 1.2, size * 0.8);
-            ctx.fillStyle = '#ff4422';
-            ctx.beginPath();
-            ctx.arc(0, size * 0.2, size * 0.3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Brazo extendido si usa Grab
-            if (usingGrab) {
-                ctx.strokeStyle = '#ff6644';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.moveTo(size * 0.6, 0);
-                ctx.lineTo(size * 3, 0);
-                ctx.stroke();
-                ctx.fillStyle = '#ff4422';
-                ctx.beginPath();
-                ctx.arc(size * 3, 0, size * 0.4, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.restore();
-        },
-        
-        drawBoogo(ctx, x, y, size, chasing) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-            gradient.addColorStop(0, '#4488ff');
-            gradient.addColorStop(1, '#224488');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.ellipse(0, 0, size, size * 1.2, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#220011';
-            ctx.beginPath();
-            ctx.ellipse(0, size * 0.2, size * 0.7, size * 0.5, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#fff';
-            for (let i = -3; i <= 3; i++) {
-                ctx.beginPath();
-                ctx.moveTo(i * size * 0.15, size * 0.1);
-                ctx.lineTo(i * size * 0.15 - size * 0.05, size * 0.4);
-                ctx.lineTo(i * size * 0.15 + size * 0.05, size * 0.4);
-                ctx.fill();
-            }
-            
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.ellipse(-size * 0.35, -size * 0.2, size * 0.25, size * 0.35, 0, 0, Math.PI * 2);
-            ctx.ellipse(size * 0.35, -size * 0.2, size * 0.25, size * 0.35, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            if (chasing) {
-                ctx.fillStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.arc(-size * 0.35, -size * 0.2, size * 0.08, 0, Math.PI * 2);
-                ctx.arc(size * 0.35, -size * 0.2, size * 0.08, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.restore();
-        },
-        
-        drawCatstar(ctx, x, y, size, chasing) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            ctx.fillStyle = '#dd8822';
-            for (let i = 0; i < 12; i++) {
-                const angle = (i / 12) * Math.PI * 2;
-                ctx.beginPath();
-                ctx.ellipse(Math.cos(angle) * size * 0.8, Math.sin(angle) * size * 0.8, size * 0.4, size * 0.2, angle, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.fillStyle = '#ffcc66';
-            ctx.beginPath();
-            ctx.arc(0, 0, size * 0.7, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = chasing ? '#ff0000' : '#665522';
-            ctx.beginPath();
-            ctx.ellipse(-size * 0.25, -size * 0.1, size * 0.15, size * 0.2, 0, 0, Math.PI * 2);
-            ctx.ellipse(size * 0.25, -size * 0.1, size * 0.15, size * 0.2, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#ff8866';
-            ctx.beginPath();
-            ctx.arc(0, size * 0.15, size * 0.12, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#330011';
-            ctx.beginPath();
-            ctx.arc(0, size * 0.3, size * 0.25, 0, Math.PI);
-            ctx.fill();
-            
-            ctx.restore();
-        },
-        
-        draw1028(ctx, x, y, size, chasing) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            const gradient = ctx.createLinearGradient(-size, -size, size, size);
-            gradient.addColorStop(0, '#556677');
-            gradient.addColorStop(0.5, '#8899aa');
-            gradient.addColorStop(1, '#445566');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(-size * 0.8, -size * 0.5, size * 1.6, size * 1.2);
-            
-            ctx.fillStyle = '#000';
-            ctx.fillRect(-size * 0.4, size * 0.1, size * 0.8, size * 0.35);
-            
-            ctx.fillStyle = chasing ? '#ff0000' : '#00ff00';
-            ctx.font = `${size * 0.4}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.fillText(chasing ? '>:(' : ':)', 0, size * 0.38);
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(0, -size * 0.5, size * 0.45, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = chasing ? '#ff0000' : '#00aaff';
-            ctx.beginPath();
-            ctx.arc(-size * 0.2, -size * 0.55, size * 0.12, 0, Math.PI * 2);
-            ctx.arc(size * 0.2, -size * 0.55, size * 0.12, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-        },
-        
-        drawRatuile(ctx, x, y, size, state) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            ctx.fillStyle = '#887766';
-            ctx.beginPath();
-            ctx.ellipse(0, 0, size * 0.9, size * 0.7, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#aa9988';
-            ctx.beginPath();
-            ctx.ellipse(-size * 0.5, -size * 0.5, size * 0.3, size * 0.25, -0.3, 0, Math.PI * 2);
-            ctx.ellipse(size * 0.5, -size * 0.5, size * 0.3, size * 0.25, 0.3, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#bbab98';
-            ctx.beginPath();
-            ctx.arc(0, size * 0.1, size * 0.5, 0, Math.PI * 2);
-            ctx.fill();
-            
-            if (state === 'happy') {
-                ctx.fillStyle = '#44aa44';
-            } else if (state === 'sad') {
-                ctx.fillStyle = '#4444aa';
-            } else {
-                ctx.fillStyle = '#ff4444';
-            }
-            ctx.beginPath();
-            ctx.arc(-size * 0.2, -size * 0.05, size * (state === 'angry' ? 0.15 : 0.12), 0, Math.PI * 2);
-            ctx.arc(size * 0.2, -size * 0.05, size * (state === 'angry' ? 0.15 : 0.12), 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-        },
-        
-        drawSlimer(ctx, x, y, size, frame) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            const wobble = Math.sin(frame * 0.1) * size * 0.1;
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.3);
-            gradient.addColorStop(0, '#88ff44');
-            gradient.addColorStop(0.5, '#66cc22');
-            gradient.addColorStop(1, '#448811');
-            ctx.fillStyle = gradient;
-            
-            ctx.beginPath();
-            ctx.ellipse(wobble, 0, size * 1.1 + wobble * 0.5, size * 0.9 + wobble * 0.3, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(-size * 0.2 + wobble * 0.5, -size * 0.15, size * 0.35, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(-size * 0.2 + wobble * 0.5, -size * 0.15, size * 0.15, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-        },
-        
-        drawTecno(ctx, x, y, size) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            const gradient = ctx.createLinearGradient(-size, -size, size, size);
-            gradient.addColorStop(0, '#445566');
-            gradient.addColorStop(0.5, '#6688aa');
-            gradient.addColorStop(1, '#334455');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(-size * 0.6, -size * 0.2, size * 1.2, size * 1);
-            
-            ctx.fillStyle = '#111';
-            ctx.beginPath();
-            ctx.roundRect(-size * 0.7, -size * 0.9, size * 1.4, size * 0.8, 5);
-            ctx.fill();
-            
-            ctx.fillStyle = '#001a11';
-            ctx.fillRect(-size * 0.55, -size * 0.8, size * 1.1, size * 0.6);
-            
-            ctx.fillStyle = '#00ff88';
-            ctx.font = `${size * 0.5}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.fillText(':)', 0, -size * 0.35);
-            
-            ctx.restore();
-        },
-        
-        drawEmily(ctx, x, y, size, phase) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            ctx.fillStyle = '#aa1122';
-            ctx.beginPath();
-            ctx.moveTo(-size * 0.4, size * 0.3);
-            ctx.lineTo(-size * 0.8, size * 1.2);
-            ctx.lineTo(size * 0.8, size * 1.2);
-            ctx.lineTo(size * 0.4, size * 0.3);
-            ctx.fill();
-            
-            ctx.fillStyle = '#ddccaa';
-            ctx.beginPath();
-            ctx.ellipse(0, -size * 0.1, size * 0.35, size * 0.45, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            const faceGradient = ctx.createRadialGradient(0, -size * 0.7, 0, 0, -size * 0.7, size * 0.6);
-            faceGradient.addColorStop(0, '#fff8f0');
-            faceGradient.addColorStop(1, '#ddc8b8');
-            ctx.fillStyle = faceGradient;
-            ctx.beginPath();
-            ctx.ellipse(0, -size * 0.7, size * 0.45, size * 0.5, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.fillStyle = '#221100';
-            ctx.beginPath();
-            ctx.ellipse(0, -size * 0.9, size * 0.5, size * 0.3, 0, 0, Math.PI);
-            ctx.fill();
-            
-            if (phase >= 2) {
-                ctx.fillStyle = '#ff0000';
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.2, -size * 0.6);
-                ctx.lineTo(-size * 0.15, -size * 0.4);
-                ctx.lineTo(-size * 0.25, -size * 0.4);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.moveTo(size * 0.2, -size * 0.6);
-                ctx.lineTo(size * 0.15, -size * 0.4);
-                ctx.lineTo(size * 0.25, -size * 0.4);
-                ctx.fill();
-            }
-            
-            ctx.fillStyle = '#111';
-            ctx.beginPath();
-            ctx.ellipse(-size * 0.15, -size * 0.75, size * 0.08, size * 0.1, 0, 0, Math.PI * 2);
-            ctx.ellipse(size * 0.15, -size * 0.75, size * 0.08, size * 0.1, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            if (phase >= 3) {
-                ctx.fillStyle = '#330011';
-                ctx.beginPath();
-                ctx.arc(0, -size * 0.55, size * 0.2, 0, Math.PI);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                for (let i = -2; i <= 2; i++) {
-                    ctx.beginPath();
-                    ctx.rect(i * size * 0.08 - size * 0.03, -size * 0.55, size * 0.06, size * 0.08);
-                    ctx.fill();
-                }
-            } else {
-                ctx.strokeStyle = '#884433';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(-size * 0.15, -size * 0.55);
-                ctx.lineTo(size * 0.15, -size * 0.55);
-                ctx.stroke();
-                ctx.fillStyle = '#884433';
-                for (let i = -2; i <= 2; i++) {
-                    ctx.beginPath();
-                    ctx.arc(i * size * 0.075, -size * 0.55, 2, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            
-            ctx.restore();
-        },
-        
-        drawExit(ctx, x, y, radius) {
-            ctx.save();
-            ctx.translate(x, y);
-            
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 2);
-            gradient.addColorStop(0, 'rgba(0,255,100,0.4)');
-            gradient.addColorStop(1, 'rgba(0,255,100,0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(0, 0, radius * 2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.strokeStyle = '#00ff66';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(0, 0, radius, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            ctx.fillStyle = '#00aa44';
-            ctx.beginPath();
-            ctx.roundRect(-radius * 0.4, -radius * 0.6, radius * 0.8, radius * 1.2, 5);
-            ctx.fill();
-            
-            ctx.fillStyle = '#ffcc00';
-            ctx.beginPath();
-            ctx.arc(radius * 0.2, 0, radius * 0.1, 0, Math.PI * 2);
-            ctx.fill();
-            
-            ctx.restore();
-        },
-        
-        drawBattery(ctx, x, y) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.fillStyle = '#ffaa00';
-            ctx.fillRect(-10, -15, 20, 30);
-            ctx.fillStyle = '#ff0';
-            ctx.fillRect(-8, -13, 16, 10);
-            ctx.fillStyle = '#fff';
-            ctx.font = '10px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('+', 0, 8);
-            ctx.restore();
-        },
-        
-        drawSwitch(ctx, x, y, active) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.fillStyle = active ? '#00ff00' : '#ff4444';
-            ctx.beginPath();
-            ctx.arc(0, 0, 15, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(0, active ? -5 : 5, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        },
-        
-        drawVHS(ctx, x, y) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.fillStyle = '#333';
-            ctx.fillRect(-15, -10, 30, 20);
-            ctx.fillStyle = '#666';
-            ctx.fillRect(-12, -7, 24, 14);
-            ctx.fillStyle = '#ff4444';
-            ctx.beginPath();
-            ctx.arc(-8, 0, 5, 0, Math.PI * 2);
-            ctx.arc(8, 0, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = '6px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('VHS', 0, 2);
-            ctx.restore();
-        }
-    };
-    
-    // GAME LOGIC
     function init() {
+        console.log('🎮 Iniciando juego...');
+        
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
         resize();
         window.addEventListener('resize', resize);
-        setupInput();
-        drawCharacterPreviews();
         
+        // Botones del menú
+        document.getElementById('playBtn').addEventListener('click', startGame);
+        document.getElementById('playBtn').addEventListener('touchend', function(e) { e.preventDefault(); startGame(); });
+        
+        // Botones del juego
+        document.getElementById('retryBtn').addEventListener('click', startGame);
+        document.getElementById('menuBtn').addEventListener('click', goToMenu);
+        document.getElementById('playAgainBtn').addEventListener('click', startGame);
+        document.getElementById('menuBtn2').addEventListener('click', goToMenu);
+        
+        // Controles móviles
         if (IS_MOBILE) {
-            document.getElementById('joystickArea').classList.add('active');
-            document.getElementById('touchActions').classList.add('active');
+            setupMobileControls();
         }
         
-        requestAnimationFrame(gameLoop);
-    }
-    
-    function drawCharacterPreviews() {
-        ['Player', 'Tecno', 'Boogo', 'Catstar', '1028', 'Ratuile', 'Slimer', 'Emily'].forEach(name => {
-            const canvas = document.getElementById('preview' + name);
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, 50, 50);
-            
-            if (name === 'Player') Sprites.drawPlayer(ctx, 25, 25, 12, 0);
-            else if (name === 'Tecno') Sprites.drawTecno(ctx, 25, 28, 15);
-            else if (name === 'Boogo') Sprites.drawBoogo(ctx, 25, 25, 12, false);
-            else if (name === 'Catstar') Sprites.drawCatstar(ctx, 25, 25, 12, false);
-            else if (name === '1028') Sprites.draw1028(ctx, 25, 25, 12, false);
-            else if (name === 'Ratuile') Sprites.drawRatuile(ctx, 25, 25, 12, 'happy');
-            else if (name === 'Slimer') Sprites.drawSlimer(ctx, 25, 25, 12, 0);
-            else if (name === 'Emily') Sprites.drawEmily(ctx, 25, 30, 15, 1);
+        // Chapter screen tap
+        document.getElementById('chapterScreen').addEventListener('click', hideChapter);
+        document.getElementById('chapterScreen').addEventListener('touchend', function(e) { e.preventDefault(); hideChapter(); });
+        
+        // Keyboard
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Escape' && state.screen === 'playing') {
+                goToMenu();
+            }
         });
+        
+        console.log('✅ Juego listo');
+        
+        // Iniciar game loop
+        requestAnimationFrame(gameLoop);
     }
     
     function resize() {
@@ -957,469 +257,311 @@
         H = canvas.height = window.innerHeight;
     }
     
-    function setupInput() {
-        window.addEventListener('keydown', e => {
-            keys[e.code] = true;
-            if (e.code === 'Escape') {
-                if (state === 'playing') pauseGame();
-                else if (state === 'paused') resumeGame();
-            }
-            if (e.code === 'KeyE') useGrabPack();
-        });
-        window.addEventListener('keyup', e => keys[e.code] = false);
-        
-        document.getElementById('chapterScreen').addEventListener('click', () => {
-            document.getElementById('chapterScreen').classList.remove('active');
-        });
-        
-        // Joystick
-        const outer = document.getElementById('joystickOuter');
-        const inner = document.getElementById('joystickInner');
-        let active = false;
-        let center = { x: 0, y: 0 };
-        
-        const handleJoystick = (x, y) => {
-            const rect = outer.getBoundingClientRect();
-            const max = rect.width / 2 - 27;
-            let dx = x - center.x, dy = y - center.y;
-            const dist = Math.hypot(dx, dy);
-            if (dist > max) { dx = dx / dist * max; dy = dy / dist * max; }
-            inner.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-            joystick.x = dx / max;
-            joystick.y = dy / max;
-        };
-        
-        outer.addEventListener('touchstart', e => {
-            e.preventDefault();
-            active = true;
-            const rect = outer.getBoundingClientRect();
-            center = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
-            handleJoystick(e.touches[0].clientX, e.touches[0].clientY);
-        });
-        outer.addEventListener('touchmove', e => { e.preventDefault(); if (active) handleJoystick(e.touches[0].clientX, e.touches[0].clientY); });
-        outer.addEventListener('touchend', e => { e.preventDefault(); active = false; joystick = { x: 0, y: 0 }; inner.style.transform = 'translate(-50%, -50%)'; });
-        
-        // Botones táctiles - Simplificado con eventos directos
+    // ========================================
+    // CONTROLES MÓVILES
+    // ========================================
+    
+    function setupMobileControls() {
+        const joystick = document.getElementById('joystick');
+        const knob = document.getElementById('joystick-knob');
         const btnRun = document.getElementById('btnRun');
         const btnGrab = document.getElementById('btnGrab');
-        const btnPause = document.getElementById('btnPause');
         
-        // Botón Correr - mantener presionado para correr
-        if (btnRun) {
-            const startRun = (e) => { e.preventDefault(); running = true; btnRun.classList.add('pressed'); };
-            const stopRun = (e) => { e.preventDefault(); running = false; btnRun.classList.remove('pressed'); };
-            btnRun.addEventListener('touchstart', startRun, { passive: false });
-            btnRun.addEventListener('touchend', stopRun, { passive: false });
-            btnRun.addEventListener('touchcancel', stopRun, { passive: false });
-            btnRun.addEventListener('mousedown', startRun);
-            btnRun.addEventListener('mouseup', stopRun);
-            btnRun.addEventListener('mouseleave', stopRun);
+        // Joystick
+        joystick.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            joystickData.active = true;
+            handleJoystick(e.touches[0]);
+        });
+        
+        joystick.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            if (joystickData.active) handleJoystick(e.touches[0]);
+        });
+        
+        joystick.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            joystickData.active = false;
+            joystickData.x = 0;
+            joystickData.y = 0;
+            knob.style.transform = 'translate(-50%, -50%)';
+        });
+        
+        function handleJoystick(touch) {
+            const rect = joystick.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const maxDist = rect.width / 2 - 25;
+            
+            let dx = touch.clientX - cx;
+            let dy = touch.clientY - cy;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            
+            if (dist > maxDist) {
+                dx = dx / dist * maxDist;
+                dy = dy / dist * maxDist;
+            }
+            
+            joystickData.x = dx / maxDist;
+            joystickData.y = dy / maxDist;
+            knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
         }
         
-        // Botón GrabPack - un toque activa
-        if (btnGrab) {
-            const doGrab = (e) => { e.preventDefault(); btnGrab.classList.add('pressed'); useGrabPack(); };
-            const endGrab = () => { btnGrab.classList.remove('pressed'); };
-            btnGrab.addEventListener('touchstart', doGrab, { passive: false });
-            btnGrab.addEventListener('touchend', endGrab, { passive: false });
-            btnGrab.addEventListener('mousedown', doGrab);
-            btnGrab.addEventListener('mouseup', endGrab);
-        }
+        // Botón correr
+        btnRun.addEventListener('touchstart', function(e) { e.preventDefault(); running = true; });
+        btnRun.addEventListener('touchend', function(e) { e.preventDefault(); running = false; });
         
-        // Botón Pausa
-        if (btnPause) {
-            const doPause = (e) => { e.preventDefault(); btnPause.classList.add('pressed'); if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); };
-            const endPause = () => { btnPause.classList.remove('pressed'); };
-            btnPause.addEventListener('touchstart', doPause, { passive: false });
-            btnPause.addEventListener('touchend', endPause, { passive: false });
-            btnPause.addEventListener('mousedown', doPause);
-            btnPause.addEventListener('mouseup', endPause);
-        }
+        // Botón grabpack
+        btnGrab.addEventListener('touchstart', function(e) { e.preventDefault(); useGrabPack(); });
     }
     
     function useGrabPack() {
-        if (state !== 'playing') return;
-        usingGrab = true;
-        setTimeout(() => usingGrab = false, 500);
-        
-        // Check for nearby switches or items
-        switches.forEach(s => {
-            if (Math.hypot(player.x - s.x, player.y - s.y) < 80) {
-                s.active = !s.active;
-                playSound('switch');
-                if (s.active) openPuzzle();
-            }
-        });
-        
-        // Collect items
-        items = items.filter(item => {
-            if (Math.hypot(player.x - item.x, player.y - item.y) < 50) {
-                if (item.type === 'battery') {
-                    player.light = Math.min(100, player.light + 30);
-                    playSound('pickup');
-                } else if (item.type === 'vhs') {
-                    showVHS(item.text);
-                }
-                return false;
-            }
-            return true;
-        });
+        console.log('🔌 GrabPack usado');
     }
     
-    // Global functions - exported immediately
-    function _showOverlay(id) { document.getElementById(id).classList.add('active'); }
-    function _hideOverlay(id) { document.getElementById(id).classList.remove('active'); }
-    function _pauseGame() { if (state === 'playing') { state = 'paused'; _showOverlay('pause'); } }
-    function _resumeGame() { state = 'playing'; _hideOverlay('pause'); }
-    function _quitGame() {
-        state = 'menu';
-        document.getElementById('menu').classList.remove('hidden');
-        document.getElementById('game').classList.remove('active');
-        _hideOverlay('pause'); _hideOverlay('gameOver'); _hideOverlay('victory');
-    }
+    // ========================================
+    // CAMBIOS DE PANTALLA
+    // ========================================
     
-    window.showOverlay = _showOverlay;
-    window.hideOverlay = _hideOverlay;
-    window.pauseGame = _pauseGame;
-    window.resumeGame = _resumeGame;
-    window.quitGame = _quitGame;
-    
-    function showVHS(text) {
-        document.getElementById('vhsTitle').textContent = '📼 CINTA VHS';
-        document.getElementById('vhsText').innerHTML = text;
-        document.getElementById('vhsOverlay').classList.add('active');
-        playSound('pickup');
-    }
-    
-    function _closeVHS() { document.getElementById('vhsOverlay').classList.remove('active'); }
-    window.closeVHS = _closeVHS;
-    
-    function openPuzzle() {
-        document.getElementById('puzzleOverlay').classList.add('active');
-        drawPuzzle();
-    }
-    
-    function _closePuzzle() { document.getElementById('puzzleOverlay').classList.remove('active'); }
-    window.closePuzzle = _closePuzzle;
-    
-    function drawPuzzle() {
-        const pCanvas = document.getElementById('puzzleCanvas');
-        const pCtx = pCanvas.getContext('2d');
-        pCtx.fillStyle = '#0a0008';
-        pCtx.fillRect(0, 0, 400, 300);
+    function startGame() {
+        console.log('▶ Iniciando partida...');
         
-        // Draw wires puzzle
-        pCtx.strokeStyle = '#ff4444';
-        pCtx.lineWidth = 4;
-        pCtx.beginPath();
-        pCtx.moveTo(50, 50);
-        pCtx.lineTo(350, 50);
-        pCtx.stroke();
-        
-        pCtx.strokeStyle = '#44ff44';
-        pCtx.beginPath();
-        pCtx.moveTo(50, 100);
-        pCtx.lineTo(350, 100);
-        pCtx.stroke();
-        
-        pCtx.strokeStyle = '#4444ff';
-        pCtx.beginPath();
-        pCtx.moveTo(50, 150);
-        pCtx.lineTo(350, 150);
-        pCtx.stroke();
-        
-        pCtx.fillStyle = '#fff';
-        pCtx.font = '16px Arial';
-        pCtx.fillText('¡Puzzle completado!', 150, 200);
-        pCtx.fillText('La puerta está abierta', 140, 230);
-    }
-    
-    function _startGame() {
-        state = 'playing';
-        chapter = 1;
-        player = { x: W/2, y: H/2, hp: 100, stamina: 100, light: 100 };
-        spawnLevel();
-        invincible = false;
+        state.screen = 'playing';
+        state.chapter = 1;
+        state.player = { x: W/2, y: H/2, hp: 100, stamina: 100, light: 100 };
+        state.enemies = [];
+        state.exit = { x: W - 80, y: H - 80 };
         
         document.getElementById('menu').classList.add('hidden');
         document.getElementById('game').classList.add('active');
-        _hideOverlay('gameOver'); _hideOverlay('victory');
+        document.getElementById('gameOver').classList.remove('active');
+        document.getElementById('victory').classList.remove('active');
         
         if (IS_MOBILE) {
-            document.getElementById('joystickArea').classList.add('active');
-            document.getElementById('touchActions').classList.add('active');
+            document.getElementById('controls').classList.add('active');
         }
         
+        spawnEnemies();
         showChapter();
+        
+        console.log('✅ Partida iniciada');
     }
-    window.startGame = _startGame;
     
-    function spawnLevel() {
-        enemies = [];
-        items = [];
-        switches = [];
-        
-        const count = Math.min(chapter + 1, 5);
-        const types = ['boogo', 'catstar', '1028', 'ratuile', 'slimer'];
-        
-        for (let i = 0; i < count; i++) {
-            let x, y;
-            do {
-                x = Math.random() * (W - 200) + 100;
-                y = Math.random() * (H - 200) + 100;
-            } while (Math.hypot(x - player.x, y - player.y) < CONFIG.SAFE_DIST);
-            
-            enemies.push({
-                x, y,
-                type: types[i % types.length],
-                speed: CONFIG.ENEMY_SPEED + chapter * 0.15,
-                angle: Math.random() * Math.PI * 2,
-                chasing: false,
-                state: 'happy'
-            });
-        }
-        
-        // Spawn batteries
-        for (let i = 0; i < 3; i++) {
-            items.push({
-                type: 'battery',
-                x: Math.random() * (W - 100) + 50,
-                y: Math.random() * (H - 100) + 50
-            });
-        }
-        
-        // Spawn VHS tape (one per chapter)
-        if (chapter <= 4) {
-            const vhsTexts = [
-                "📅 <b>14 de Marzo, 1987</b><br><br>Todo iba bien en Playtime Factory. Los niños amaban los juguetes. Entonces... algo salió mal.<br><br>Boogo empezó a moverse solo.",
-                "📅 <b>15 de Marzo, 1987</b><br><br>Hemos perdido el control. Catstar atacó a un empleado. 1028... ya no es confiable.<br><br>Tenemos que cerrar la fábrica.",
-                "📅 <b>16 de Marzo, 1987</b><br><br>La única salida es a través del laboratorio. Pero Emily... ella no quiere que nadie se vaya.<br><br>No confíes en nadie.",
-                "📅 <b>17 de Marzo, 1987</b><br><br>Si estás leyendo esto, ya es tarde. La fábrica tiene vida propia.<br><br>El único camino es la salida principal. Pero Emily te esperará allí.<br><br>¡BUENA SUERTE!"
-            ];
-            items.push({
-                type: 'vhs',
-                text: vhsTexts[chapter - 1],
-                x: Math.random() * (W - 200) + 100,
-                y: Math.random() * (H - 200) + 100
-            });
-        }
-        
-        exitZone = { x: W - 100, y: H - 100, r: 50 };
+    function goToMenu() {
+        state.screen = 'menu';
+        document.getElementById('menu').classList.remove('hidden');
+        document.getElementById('game').classList.remove('active');
+        document.getElementById('gameOver').classList.remove('active');
+        document.getElementById('victory').classList.remove('active');
+        document.getElementById('controls').classList.remove('active');
     }
     
     function showChapter() {
-        document.getElementById('chapTitle').textContent = 'CAPÍTULO ' + chapter;
-        document.getElementById('chapSub').textContent = CONFIG.CHAPTERS[chapter - 1] || 'Final';
+        document.getElementById('chapTitle').textContent = 'CAPÍTULO ' + state.chapter;
+        document.getElementById('chapSub').textContent = CHAPTERS[state.chapter - 1] || 'Final';
         document.getElementById('chapterScreen').classList.add('active');
     }
     
-    function nextChapter() {
-        chapter++;
-        if (chapter > 4) { state = 'victory'; showOverlay('victory'); }
-        else {
-            player.x = W/2; player.y = H/2;
-            player.hp = Math.min(100, player.hp + 25);
-            player.light = 100;
-            spawnLevel();
-            showChapter();
+    function hideChapter() {
+        document.getElementById('chapterScreen').classList.remove('active');
+    }
+    
+    function gameOver(msg) {
+        state.screen = 'gameover';
+        document.getElementById('deathMsg').textContent = msg || 'Te atraparon...';
+        document.getElementById('gameOver').classList.add('active');
+    }
+    
+    function victory() {
+        state.screen = 'victory';
+        document.getElementById('victory').classList.add('active');
+    }
+    
+    // ========================================
+    // LÓGICA DEL JUEGO
+    // ========================================
+    
+    function spawnEnemies() {
+        state.enemies = [];
+        const count = Math.min(state.chapter + 1, 5);
+        const types = ['boogo', 'catstar', 'robot', 'rat', 'slime'];
+        
+        for (let i = 0; i < count; i++) {
+            state.enemies.push({
+                x: Math.random() * (W - 100) + 50,
+                y: Math.random() * (H - 100) + 50,
+                type: types[i % types.length],
+                speed: 1 + state.chapter * 0.2
+            });
         }
     }
     
     function update() {
-        if (state !== 'playing') return;
+        if (state.screen !== 'playing') return;
+        
         frame++;
         
-        // Light flicker effect
-        if (Math.random() < 0.01) {
-            lightFlicker = 0.3 + Math.random() * 0.7;
-            setTimeout(() => lightFlicker = 1, 50 + Math.random() * 100);
-        }
-        
-        // Ambient sounds
-        if (Math.random() < 0.002) playSound('ambient');
-        
-        if (invincible) { invincibleTime--; if (invincibleTime <= 0) invincible = false; }
-        
-        // Movement
+        // Movimiento del jugador
         let dx = 0, dy = 0;
-        if (keys['KeyW'] || keys['ArrowUp']) dy -= 1;
-        if (keys['KeyS'] || keys['ArrowDown']) dy += 1;
-        if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
-        if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
-        if (IS_MOBILE && (Math.abs(joystick.x) > 0.1 || Math.abs(joystick.y) > 0.1)) {
-            dx = joystick.x; dy = joystick.y;
+        
+        // Joystick móvil
+        if (IS_MOBILE && joystickData.active) {
+            dx = joystickData.x;
+            dy = joystickData.y;
         }
         
-        const mag = Math.hypot(dx, dy);
+        // Teclado
+        const keys = {};
+        if (keyState['KeyW'] || keyState['ArrowUp']) dy -= 1;
+        if (keyState['KeyS'] || keyState['ArrowDown']) dy += 1;
+        if (keyState['KeyA'] || keyState['ArrowLeft']) dx -= 1;
+        if (keyState['KeyD'] || keyState['ArrowRight']) dx += 1;
+        
+        const mag = Math.sqrt(dx*dx + dy*dy);
         if (mag > 0) { dx /= mag; dy /= mag; }
         
-        let speed = CONFIG.PLAYER_SPEED;
-        const isRunning = running || keys['ShiftLeft'] || keys['ShiftRight'] || keys['Space'];
-        if (isRunning && player.stamina > 0 && mag > 0) {
-            speed = CONFIG.PLAYER_RUN_SPEED;
-            player.stamina -= 0.5;
+        const speed = running ? 6 : 3;
+        state.player.x = Math.max(20, Math.min(W - 20, state.player.x + dx * speed));
+        state.player.y = Math.max(20, Math.min(H - 20, state.player.y + dy * speed));
+        
+        // Stamina
+        if (running && (dx !== 0 || dy !== 0)) {
+            state.player.stamina = Math.max(0, state.player.stamina - 0.5);
+            if (state.player.stamina === 0) running = false;
         } else {
-            player.stamina = Math.min(100, player.stamina + 0.3);
+            state.player.stamina = Math.min(100, state.player.stamina + 0.3);
         }
         
-        player.x = Math.max(CONFIG.PLAYER_SIZE, Math.min(W - CONFIG.PLAYER_SIZE, player.x + dx * speed));
-        player.y = Math.max(CONFIG.PLAYER_SIZE, Math.min(H - CONFIG.PLAYER_SIZE, player.y + dy * speed));
+        // Luz
+        state.player.light = Math.max(0, state.player.light - 0.01);
         
-        // Light drain
-        player.light = Math.max(0, player.light - 0.02);
-        
-        // Enemies
-        enemies.forEach(e => {
-            const dist = Math.hypot(player.x - e.x, player.y - e.y);
+        // Enemigos
+        state.enemies.forEach(e => {
+            const dist = Math.sqrt(Math.pow(state.player.x - e.x, 2) + Math.pow(state.player.y - e.y, 2));
             
-            if (dist < 250 && player.light > 15) {
-                e.chasing = true;
-                const angle = Math.atan2(player.y - e.y, player.x - e.x);
-                e.x += Math.cos(angle) * e.speed * 1.5;
-                e.y += Math.sin(angle) * e.speed * 1.5;
+            if (dist < 200 && state.player.light > 10) {
+                // Perseguir
+                const angle = Math.atan2(state.player.y - e.y, state.player.x - e.x);
+                e.x += Math.cos(angle) * e.speed;
+                e.y += Math.sin(angle) * e.speed;
             } else {
-                e.chasing = false;
-                e.angle += (Math.random() - 0.5) * 0.1;
-                e.x += Math.cos(e.angle) * e.speed * 0.5;
-                e.y += Math.sin(e.angle) * e.speed * 0.5;
-                if (e.x < 50 || e.x > W - 50) e.angle = Math.PI - e.angle;
-                if (e.y < 50 || e.y > H - 50) e.angle = -e.angle;
+                // Patrullar
+                e.x += Math.cos(frame * 0.02 + e.speed) * 0.5;
+                e.y += Math.sin(frame * 0.02 + e.speed) * 0.5;
             }
             
-            e.x = Math.max(30, Math.min(W - 30, e.x));
-            e.y = Math.max(30, Math.min(H - 30, e.y));
-            
-            if (e.type === 'ratuile' && Math.random() < 0.01) {
-                const states = ['happy', 'sad', 'angry'];
-                e.state = states[Math.floor(Math.random() * 3)];
-            }
-            
-            if (dist < 35 && !invincible) {
-                player.hp -= CONFIG.ENEMY_DAMAGE;
-                invincible = true;
-                invincibleTime = 60;
-                playSound('damage');
-                const push = Math.atan2(player.y - e.y, player.x - e.x);
-                e.x -= Math.cos(push) * 60;
-                e.y -= Math.sin(push) * 60;
+            // Colisión
+            if (dist < 30 && state.player.hp > 0) {
+                state.player.hp -= 5;
+                if (state.player.hp <= 0) {
+                    gameOver('¡Un enemigo te atrapó!');
+                }
             }
         });
         
-        // Exit
-        if (Math.hypot(player.x - exitZone.x, player.y - exitZone.y) < exitZone.r + CONFIG.PLAYER_SIZE) {
-            nextChapter();
+        // Meta
+        const exitDist = Math.sqrt(Math.pow(state.player.x - state.exit.x, 2) + Math.pow(state.player.y - state.exit.y, 2));
+        if (exitDist < 40) {
+            state.chapter++;
+            if (state.chapter > 4) {
+                victory();
+            } else {
+                state.player.x = W / 2;
+                state.player.y = H / 2;
+                state.player.hp = Math.min(100, state.player.hp + 25);
+                state.player.light = 100;
+                spawnEnemies();
+                showChapter();
+            }
         }
         
-        // Game Over
-        if (player.hp <= 0) {
-            state = 'gameover';
-            const msgs = ['Boogo te atrapó...', 'Catstar te arañó...', '1028 te traicionó...', 'Ratuile te mordió...', 'Slimer te absorbió...'];
-            document.getElementById('deathMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
-            showOverlay('gameOver');
-        }
-        
-        // HUD
-        document.getElementById('healthFill').style.width = player.hp + '%';
-        document.getElementById('staminaFill').style.width = player.stamina + '%';
-        document.getElementById('lightFill').style.width = player.light + '%';
-        document.getElementById('chapterInfo').textContent = 'CAPÍTULO ' + chapter;
-        
-        // GrabPack indicator
-        const nearSwitch = switches.some(s => Math.hypot(player.x - s.x, player.y - s.y) < 80);
-        document.getElementById('grabpack').className = nearSwitch ? 'ready' : '';
+        // Actualizar HUD
+        document.getElementById('healthFill').style.width = state.player.hp + '%';
+        document.getElementById('staminaFill').style.width = state.player.stamina + '%';
+        document.getElementById('lightFill').style.width = state.player.light + '%';
     }
+    
+    // Estado del teclado
+    const keyState = {};
+    window.addEventListener('keydown', e => keyState[e.code] = true);
+    window.addEventListener('keyup', e => keyState[e.code] = false);
     
     function draw() {
         ctx.fillStyle = '#0a0008';
         ctx.fillRect(0, 0, W, H);
         
-        if (state !== 'playing' && state !== 'paused') return;
+        if (state.screen !== 'playing') return;
         
-        // Floor grid
+        // Grid del suelo
         ctx.strokeStyle = '#150510';
         ctx.lineWidth = 1;
-        for (let x = 0; x < W; x += 60) {
-            ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-        }
-        for (let y = 0; y < H; y += 60) {
-            ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-        }
-        
-        // Particles (dust)
-        ctx.fillStyle = 'rgba(255,255,255,0.02)';
-        for (let i = 0; i < 50; i++) {
-            const px = (Math.sin(frame * 0.01 + i * 7) * 0.5 + 0.5) * W;
-            const py = (Math.cos(frame * 0.01 + i * 11) * 0.5 + 0.5) * H;
+        for (let x = 0; x < W; x += 50) {
             ctx.beginPath();
-            ctx.arc(px, py, 2, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, H);
+            ctx.stroke();
         }
-        
-        // Items
-        items.forEach(item => {
-            if (item.type === 'battery') {
-                Sprites.drawBattery(ctx, item.x, item.y);
-            } else if (item.type === 'vhs') {
-                Sprites.drawVHS(ctx, item.x, item.y);
-            }
-        });
-        
-        // Exit
-        Sprites.drawExit(ctx, exitZone.x, exitZone.y, exitZone.r);
-        
-        // Enemies
-        const lightR = Math.max(CONFIG.MIN_LIGHT, CONFIG.LIGHT_RADIUS * (player.light / 100) * lightFlicker);
-        enemies.forEach(e => {
-            if (Math.hypot(player.x - e.x, player.y - e.y) < lightR) {
-                switch (e.type) {
-                    case 'boogo': Sprites.drawBoogo(ctx, e.x, e.y, 25, e.chasing); break;
-                    case 'catstar': Sprites.drawCatstar(ctx, e.x, e.y, 22, e.chasing); break;
-                    case '1028': Sprites.draw1028(ctx, e.x, e.y, 22, e.chasing); break;
-                    case 'ratuile': Sprites.drawRatuile(ctx, e.x, e.y, 20, e.state); break;
-                    case 'slimer': Sprites.drawSlimer(ctx, e.x, e.y, 22, frame); break;
-                }
-            }
-        });
-        
-        // Player
-        if (!invincible || Math.floor(frame / 4) % 2 === 0) {
-            Sprites.drawPlayer(ctx, player.x, player.y, CONFIG.PLAYER_SIZE, frame);
-        }
-        
-        if (invincible) {
-            ctx.strokeStyle = 'rgba(255, 200, 0, 0.6)';
-            ctx.lineWidth = 3;
+        for (let y = 0; y < H; y += 50) {
             ctx.beginPath();
-            ctx.arc(player.x, player.y, CONFIG.PLAYER_SIZE + 10 + Math.sin(frame * 0.3) * 5, 0, Math.PI * 2);
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
             ctx.stroke();
         }
         
-        // Light effect with flicker
+        // Meta (salida)
+        ctx.beginPath();
+        ctx.arc(state.exit.x, state.exit.y, 40, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0, 255, 100, 0.3)';
+        ctx.fill();
+        ctx.strokeStyle = '#00ff66';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#00ff66';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('🚪', state.exit.x, state.exit.y + 7);
+        
+        // Enemigos
+        const lightRadius = 200 * (state.player.light / 100);
+        state.enemies.forEach(e => {
+            const dist = Math.sqrt(Math.pow(state.player.x - e.x, 2) + Math.pow(state.player.y - e.y, 2));
+            if (dist < lightRadius) {
+                ctx.beginPath();
+                ctx.arc(e.x, e.y, 20, 0, Math.PI * 2);
+                ctx.fillStyle = e.type === 'boogo' ? '#4488ff' : 
+                                 e.type === 'catstar' ? '#dd8822' : 
+                                 e.type === 'robot' ? '#888' : 
+                                 e.type === 'rat' ? '#876' : '#8f8';
+                ctx.fill();
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(e.x - 7, e.y - 5, 4, 0, Math.PI * 2);
+                ctx.arc(e.x + 7, e.y - 5, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        });
+        
+        // Jugador
+        ctx.beginPath();
+        ctx.arc(state.player.x, state.player.y, 15, 0, Math.PI * 2);
+        ctx.fillStyle = '#3498db';
+        ctx.fill();
+        ctx.strokeStyle = '#2980b9';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Linterna (círculo de luz)
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
-        const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, lightR);
+        const gradient = ctx.createRadialGradient(state.player.x, state.player.y, 0, state.player.x, state.player.y, lightRadius);
         gradient.addColorStop(0, 'rgba(0,0,0,1)');
-        gradient.addColorStop(0.6, 'rgba(0,0,0,0.85)');
+        gradient.addColorStop(0.7, 'rgba(0,0,0,0.8)');
         gradient.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(player.x, player.y, lightR, 0, Math.PI * 2);
+        ctx.arc(state.player.x, state.player.y, lightRadius, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
-        
-        // Exit glow
-        if (Math.hypot(player.x - exitZone.x, player.y - exitZone.y) < 250) {
-            ctx.save();
-            ctx.globalCompositeOperation = 'destination-out';
-            const eg = ctx.createRadialGradient(exitZone.x, exitZone.y, 0, exitZone.x, exitZone.y, 100);
-            eg.addColorStop(0, 'rgba(0,0,0,0.6)');
-            eg.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = eg;
-            ctx.beginPath();
-            ctx.arc(exitZone.x, exitZone.y, 100, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
     }
     
     function gameLoop() {
@@ -1428,6 +570,7 @@
         requestAnimationFrame(gameLoop);
     }
     
+    // Iniciar cuando cargue
     window.addEventListener('load', init);
     </script>
 </body>
