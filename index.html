@@ -32,6 +32,11 @@
         }
         #menu.hidden { display: none; }
         
+        .btn {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         .title {
             font-size: clamp(2rem, 6vw, 4rem);
             color: #ff2244;
@@ -251,9 +256,9 @@
     <div id="menu">
         <h1 class="title">THE FORGOTTEN<br>PLAYROOM</h1>
         <p class="subtitle">Una fábrica abandonada... juguetes olvidados... terror</p>
-        <button class="btn" onclick="startGame()">▶ JUGAR</button>
-        <button class="btn" onclick="showOverlay('charsScreen')">PERSONAJES</button>
-        <button class="btn" onclick="showOverlay('controlsScreen')">CONTROLES</button>
+        <button class="btn" onclick="startGame()" ontouchend="startGame()">▶ JUGAR</button>
+        <button class="btn" onclick="showOverlay('charsScreen')" ontouchend="showOverlay('charsScreen')">PERSONAJES</button>
+        <button class="btn" onclick="showOverlay('controlsScreen')" ontouchend="showOverlay('controlsScreen')">CONTROLES</button>
         <p style="color:#ff2244; margin-top:30px; font-size:0.8rem;">⚠️ Terror psicológico - Mayores de 12</p>
     </div>
     
@@ -297,7 +302,7 @@
                 <div class="char-info"><h4>EMILY (BOSS)</h4><p>Muñeca de porcelana - Final</p></div>
             </div>
         </div>
-        <button class="btn" onclick="hideOverlay('charsScreen')">CERRAR</button>
+        <button class="btn" onclick="hideOverlay('charsScreen')" ontouchend="hideOverlay('charsScreen')">CERRAR</button>
     </div>
     
     <!-- CONTROLES -->
@@ -319,7 +324,7 @@
             <p>WASD: Mover | Shift: Correr</p>
             <p>E: Usar GrabPack | ESC: Pausar</p>
         </div>
-        <button class="btn" onclick="hideOverlay('controlsScreen')">CERRAR</button>
+        <button class="btn" onclick="hideOverlay('controlsScreen')" ontouchend="hideOverlay('controlsScreen')">CERRAR</button>
     </div>
     
     <!-- JUEGO -->
@@ -416,6 +421,11 @@
         if (state === 'playing') pauseGame();
         else if (state === 'paused') resumeGame();
     };
+    
+    // Funciones globales del menú
+    window.startGame = startGame;
+    window.showChars = () => showOverlay('charsScreen');
+    window.showControls = () => showOverlay('controlsScreen');
     
     // AUDIO
     let audioCtx = null;
@@ -1385,6 +1395,20 @@
         draw();
         requestAnimationFrame(gameLoop);
     }
+    
+    // EXPORTAR TODAS LAS FUNCIONES AL SCOPE GLOBAL
+    window.startGame = startGame;
+    window.pauseGame = pauseGame;
+    window.resumeGame = resumeGame;
+    window.quitGame = quitGame;
+    window.useGrabPack = useGrabPack;
+    window.showOverlay = showOverlay;
+    window.hideOverlay = hideOverlay;
+    window.closeVHS = closeVHS;
+    window.closePuzzle = closePuzzle;
+    
+    // EXPORTAR VARIABLES NECESARIAS
+    window.gameState = { running, state };
     
     window.addEventListener('load', init);
     </script>
