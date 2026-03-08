@@ -6,463 +6,828 @@
     <title>The Forgotten Playroom</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         html, body {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             overflow: hidden;
             background: #000;
             touch-action: none;
             -webkit-touch-callout: none;
-            -webkit-user-select: none;
             user-select: none;
         }
         
-        /* MENÚ PRINCIPAL */
+        /* MENÚ */
         #menu {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(180deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a0a 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0;
+            background: linear-gradient(180deg, #0a0005 0%, #1a0a15 50%, #0a0005 100%);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
             z-index: 100;
         }
         #menu.hidden { display: none; }
         
-        .game-logo {
-            width: 280px;
-            height: 80px;
-            margin-bottom: 20px;
-        }
-        
         .title {
-            font-size: clamp(1.8rem, 6vw, 3rem);
-            color: #ff3333;
-            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 40px #ff000066;
-            margin-bottom: 10px;
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: #ff2244;
+            text-shadow: 0 0 10px #ff0022, 0 0 30px #ff002266, 0 0 60px #ff002233;
             text-align: center;
-            font-family: 'Creepster', 'Impact', sans-serif;
-            letter-spacing: 2px;
-            animation: flicker 3s infinite;
+            font-family: 'Impact', sans-serif;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            animation: titlePulse 2s infinite;
+        }
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 10px #ff0022, 0 0 30px #ff002266; }
+            50% { text-shadow: 0 0 20px #ff0022, 0 0 50px #ff002288, 0 0 80px #ff0022; }
         }
         
-        @keyframes flicker {
-            0%, 100% { opacity: 1; }
-            92% { opacity: 1; }
-            93% { opacity: 0.3; }
-            94% { opacity: 1; }
-            96% { opacity: 0.5; }
-            97% { opacity: 1; }
-        }
-        
-        .subtitle {
-            color: #666;
-            margin-bottom: 40px;
-            font-size: 1rem;
-            text-align: center;
-        }
+        .subtitle { color: #666; margin-bottom: 40px; font-size: 1rem; text-align: center; }
         
         .btn {
-            padding: 15px 50px;
-            margin: 10px;
-            font-size: 1.1rem;
-            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
-            border: 2px solid #ff3333;
-            color: #fff;
+            padding: 15px 60px; margin: 10px;
+            background: linear-gradient(180deg, #2a1525, #1a0a15);
+            border: 2px solid #ff2244;
+            color: #fff; font-size: 1.1rem;
             border-radius: 5px;
-            cursor: pointer;
-            min-width: 200px;
+            cursor: pointer; min-width: 200px;
+            text-transform: uppercase; letter-spacing: 2px;
             transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Segoe UI', sans-serif;
         }
-        .btn:hover {
-            background: #ff3333;
-            box-shadow: 0 0 20px #ff000066;
-        }
-        .btn:active {
-            transform: scale(0.98);
-        }
+        .btn:hover { background: #ff2244; box-shadow: 0 0 30px #ff002266; }
         
-        /* HUD PROFESIONAL */
+        /* JUEGO */
         #game { display: none; }
         #game.active { display: block; }
+        #canvas { width: 100%; height: 100%; display: block; }
         
-        #canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        
+        /* HUD */
         #hud {
-            position: fixed;
-            top: 20px;
-            left: 20px;
+            position: fixed; top: 15px; left: 15px;
+            display: flex; flex-direction: column; gap: 8px;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
         }
-        
-        .stat-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 8px 12px;
-            border-radius: 4px;
+        .stat { 
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(10,0,5,0.9);
+            padding: 6px 12px; border-radius: 4px;
             border-left: 3px solid;
-            backdrop-filter: blur(5px);
         }
-        .stat-bar.health { border-color: #ff3333; }
-        .stat-bar.stamina { border-color: #33aaff; }
-        .stat-bar.light { border-color: #ffaa00; }
-        
-        .stat-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-        .stat-fill {
-            width: 150px;
-            height: 12px;
-            background: #1a1a1a;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .stat-inner {
-            height: 100%;
-            border-radius: 2px;
-            transition: width 0.2s;
-        }
-        #healthFill { background: linear-gradient(90deg, #ff3333, #ff6666); }
-        #staminaFill { background: linear-gradient(90deg, #33aaff, #66ccff); }
-        #lightFill { background: linear-gradient(90deg, #ffaa00, #ffcc00); }
+        .stat.health { border-color: #ff2244; }
+        .stat.stamina { border-color: #22aaff; }
+        .stat.light { border-color: #ffaa22; }
+        .stat-fill { width: 120px; height: 10px; background: #1a0a15; border-radius: 2px; overflow: hidden; }
+        .stat-inner { height: 100%; transition: width 0.2s; }
+        #healthFill { background: linear-gradient(90deg, #ff2244, #ff6688); }
+        #staminaFill { background: linear-gradient(90deg, #22aaff, #66ccff); }
+        #lightFill { background: linear-gradient(90deg, #ffaa22, #ffcc66); }
         
         #chapterInfo {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.8);
-            padding: 10px 20px;
-            border-radius: 4px;
-            border: 1px solid #ff3333;
-            color: #ff6666;
-            font-family: 'Segoe UI', sans-serif;
-            z-index: 10;
+            position: fixed; top: 15px; right: 15px;
+            background: rgba(10,0,5,0.9);
+            padding: 10px 20px; border-radius: 4px;
+            border: 1px solid #ff2244;
+            color: #ff6688; font-family: 'Courier New', monospace;
+            font-size: 0.9rem; z-index: 10;
         }
         
-        /* JOYSTICK PROFESIONAL */
+        /* CONTROLES MÓVIL */
         #joystickArea {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 140px;
-            height: 140px;
-            z-index: 50;
-            display: none;
+            position: fixed; bottom: 25px; left: 25px;
+            width: 130px; height: 130px;
+            z-index: 50; display: none;
         }
-        #joystickArea.active { display: block; opacity: 0.8; }
-        
+        #joystickArea.active { display: block; }
         .joystick-outer {
-            width: 140px;
-            height: 140px;
-            background: rgba(20,20,20,0.8);
-            border: 3px solid rgba(255,51,51,0.5);
-            border-radius: 50%;
-            position: relative;
+            width: 130px; height: 130px;
+            background: rgba(10,0,5,0.8);
+            border: 3px solid rgba(255,34,68,0.5);
+            border-radius: 50%; position: relative;
         }
         .joystick-inner {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(180deg, #ff3333, #aa0000);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            width: 55px; height: 55px;
+            background: linear-gradient(180deg, #ff2244, #aa0022);
+            border-radius: 50%; position: absolute;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(255,0,22,0.5);
         }
         
-        /* BOTONES DE ACCIÓN */
         #touchActions {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 50;
-            display: none;
-            flex-direction: row;
-            gap: 15px;
+            position: fixed; bottom: 25px; right: 25px;
+            z-index: 50; display: none; gap: 12px;
         }
         #touchActions.active { display: flex; }
-        
         .action-btn {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
-            border: 2px solid #ff3333;
-            border-radius: 50%;
-            color: #fff;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 65px; height: 65px;
+            background: linear-gradient(180deg, #2a1525, #1a0a15);
+            border: 2px solid #ff2244;
+            border-radius: 50%; color: #fff;
+            font-size: 22px; display: flex;
+            align-items: center; justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
-        .action-btn:active {
-            background: #ff3333;
-            transform: scale(0.95);
-        }
+        .action-btn:active { background: #ff2244; transform: scale(0.95); }
         
         /* OVERLAYS */
         .overlay {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: rgba(0,0,0,0.95);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
             z-index: 80;
         }
         .overlay.active { display: flex; }
-        .overlay h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-        }
-        .overlay p { color: #888; margin-bottom: 30px; }
-        #gameOver h1 { color: #ff3333; text-shadow: 0 0 20px #ff0000; }
-        #victory h1 { color: #33ff33; text-shadow: 0 0 20px #00ff00; }
-        #pause h1 { color: #ffaa00; }
+        .overlay h1 { font-size: clamp(2rem, 8vw, 4rem); margin-bottom: 20px; text-transform: uppercase; }
+        .overlay p { color: #666; margin-bottom: 30px; }
+        #gameOver h1 { color: #ff2244; text-shadow: 0 0 30px #ff0022; }
+        #victory h1 { color: #22ff66; text-shadow: 0 0 30px #22ff44; }
+        #pause h1 { color: #ffaa22; }
         
-        /* CHAPTER SCREEN */
         #chapterScreen {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: fixed; inset: 0; background: #000;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
             z-index: 90;
         }
         #chapterScreen.active { display: flex; }
-        #chapterScreen h1 { color: #ff3333; font-size: 2.5rem; text-shadow: 0 0 30px #ff0000; }
-        #chapterScreen h2 { color: #888; font-size: 1.5rem; margin-top: 10px; }
+        #chapterScreen h1 { color: #ff2244; font-size: clamp(2rem, 6vw, 3.5rem); text-shadow: 0 0 30px #ff0022; }
+        #chapterScreen h2 { color: #888; font-size: clamp(1rem, 4vw, 1.8rem); margin-top: 10px; }
         #chapterScreen p { color: #444; margin-top: 40px; }
         
-        /* INFO SCREENS */
-        .info-screen { max-width: 90%; width: 400px; }
-        .info-screen h3 { color: #ff3333; font-size: 1.2rem; margin: 15px 0 10px; }
-        .info-screen p { margin: 5px 0; font-size: 0.9rem; }
-        .char-row { display: flex; align-items: center; gap: 10px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin: 5px 0; }
-        .char-row.enemy { border-left: 3px solid #ff3333; }
-        .char-row.ally { border-left: 3px solid #33ff33; }
-        
-        @media (max-width: 600px) {
-            .title { font-size: 1.5rem; }
-            .btn { min-width: 160px; padding: 12px 30px; }
-            .stat-fill { width: 100px; }
-            #joystickArea { width: 120px; height: 120px; }
-            .joystick-outer { width: 120px; height: 120px; }
-            .action-btn { width: 60px; height: 60px; font-size: 20px; }
+        .info-screen { max-width: 90%; width: 380px; padding: 20px; }
+        .char-box { 
+            display: flex; align-items: center; gap: 15px; 
+            padding: 12px; margin: 8px 0;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px; border-left: 4px solid;
         }
+        .char-box.enemy { border-color: #ff2244; }
+        .char-box.ally { border-color: #22ff66; }
+        .char-preview { width: 50px; height: 50px; border-radius: 4px; }
+        .char-info h4 { color: #ff6688; font-size: 1rem; margin-bottom: 4px; }
+        .char-info p { color: #888; font-size: 0.8rem; }
+        
+        /* CANVAS PARA SPRITES */
+        #spriteCanvas { display: none; }
     </style>
 </head>
 <body>
-    <!-- MENÚ PRINCIPAL -->
+    <canvas id="spriteCanvas"></canvas>
+    
+    <!-- MENÚ -->
     <div id="menu">
         <h1 class="title">THE FORGOTTEN<br>PLAYROOM</h1>
-        <p class="subtitle">Una fábrica abandonada... secretos oscuros... ¿puedes escapar?</p>
-        
+        <p class="subtitle">Una fábrica abandonada... juguetes olvidados... terror</p>
         <button class="btn" onclick="startGame()">▶ JUGAR</button>
-        <button class="btn" onclick="showOverlay('controlsScreen')">CONTROLES</button>
         <button class="btn" onclick="showOverlay('charsScreen')">PERSONAJES</button>
-        
-        <p style="color: #ff3333; margin-top: 40px; font-size: 0.8rem;">⚠️ Juego de terror - Recomendado +12 años</p>
-    </div>
-    
-    <!-- CONTROLES -->
-    <div id="controlsScreen" class="overlay">
-        <h1 style="color: #ffaa00;">CONTROLES</h1>
-        <div class="info-screen">
-            <h3>📱 En Móvil / Tablet</h3>
-            <p><strong>Joystick izquierdo:</strong> Mover</p>
-            <p><strong>Botón ▶:</strong> Correr</p>
-            <p><strong>Botón ❚❚:</strong> Pausar</p>
-            
-            <h3>💻 En PC</h3>
-            <p><strong>WASD / Flechas:</strong> Mover</p>
-            <p><strong>Shift:</strong> Correr</p>
-            <p><strong>ESC:</strong> Pausar</p>
-            
-            <h3>🎯 Objetivo</h3>
-            <p>Encuentra la <span style="color:#33ff33">SALIDA VERDE</span> en cada nivel.</p>
-            <p>Evita a los <span style="color:#ff3333">monstruos</span>.</p>
-            <p>4 capítulos para escapar.</p>
-        </div>
-        <button class="btn" onclick="hideOverlay('controlsScreen')">CERRAR</button>
+        <button class="btn" onclick="showOverlay('controlsScreen')">CONTROLES</button>
+        <p style="color:#ff2244; margin-top:30px; font-size:0.8rem;">⚠️ Terror psicológico - Mayores de 12</p>
     </div>
     
     <!-- PERSONAJES -->
     <div id="charsScreen" class="overlay">
-        <h1 style="color: #ff3333;">PERSONAJES</h1>
+        <h1 style="color:#ff2244;">PERSONAJES</h1>
         <div class="info-screen">
-            <h3 style="color: #33ff33;">ALIADOS</h3>
-            <div class="char-row ally">
-                <span style="font-size: 30px;">👤</span>
-                <div><strong>El Detective</strong><br><small>Tú - Escapa de la fábrica</small></div>
+            <h3 style="color:#22ff66; margin-bottom:15px;">🟢 ALIADOS</h3>
+            <div class="char-box ally">
+                <canvas class="char-preview" id="previewPlayer" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>EL DETECTIVE (Tú)</h4>
+                    <p>Ex-empleado que regresa a la fábrica...</p>
+                </div>
             </div>
-            <div class="char-row ally">
-                <span style="font-size: 30px;">📺</span>
-                <div><strong>Tecno Player</strong><br><small>Robot aliado - Capítulo 2+</small></div>
+            <div class="char-box ally">
+                <canvas class="char-preview" id="previewTecno" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>TECNO PLAYER</h4>
+                    <p>Robot aliado con pantalla de TV</p>
+                </div>
             </div>
             
-            <h3 style="color: #ff3333;">ENEMIGOS</h3>
-            <div class="char-row enemy">
-                <span style="font-size: 30px;">🧸</span>
-                <div><strong>Boogo</strong><br><small>Oso de peluche demoníaco</small></div>
+            <h3 style="color:#ff2244; margin:20px 0 15px;">🔴 ENEMIGOS</h3>
+            <div class="char-box enemy">
+                <canvas class="char-preview" id="previewBoogo" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>BOOGO</h4>
+                    <p>Peluche azul con dientes afilados</p>
+                </div>
             </div>
-            <div class="char-row enemy">
-                <span style="font-size: 30px;">🦁</span>
-                <div><strong>Catstar</strong><br><small>León con garras afiladas</small></div>
+            <div class="char-box enemy">
+                <canvas class="char-preview" id="previewCatstar" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>CATSTAR</h4>
+                    <p>León de peluche con garras</p>
+                </div>
             </div>
-            <div class="char-row enemy">
-                <span style="font-size: 30px;">🤖</span>
-                <div><strong>1028</strong><br><small>Robot traidor - Cuidado</small></div>
+            <div class="char-box enemy">
+                <canvas class="char-preview" id="preview1028" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>1028</h4>
+                    <p>Robot traicionero con sierra</p>
+                </div>
             </div>
-            <div class="char-row enemy">
-                <span style="font-size: 30px;">🐀</span>
-                <div><strong>Ratuile</strong><br><small>Rata impredecible</small></div>
+            <div class="char-box enemy">
+                <canvas class="char-preview" id="previewRatuile" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>RATUILE</h4>
+                    <p>Rata con 3 estados de ánimo</p>
+                </div>
             </div>
-            <div class="char-row enemy">
-                <span style="font-size: 30px;">🟢</span>
-                <div><strong>Slimer</strong><br><small>Deja rastro pegajoso</small></div>
+            <div class="char-box enemy">
+                <canvas class="char-preview" id="previewSlimer" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>SLIMER</h4>
+                    <p>Masa verde que deja rastro</p>
+                </div>
             </div>
-            <div class="char-row enemy" style="border-color: #ff0000; background: rgba(255,0,0,0.1);">
-                <span style="font-size: 30px;">👧</span>
-                <div><strong>EMILY</strong><br><small>JEFE FINAL - Capítulo 4</small></div>
+            <div class="char-box enemy" style="border-color:#ff0000; background:rgba(255,0,0,0.1);">
+                <canvas class="char-preview" id="previewEmily" width="50" height="50"></canvas>
+                <div class="char-info">
+                    <h4>EMILY (BOSS)</h4>
+                    <p>Muñeca de porcelana - Capítulo 4</p>
+                </div>
             </div>
         </div>
         <button class="btn" onclick="hideOverlay('charsScreen')">CERRAR</button>
     </div>
     
+    <!-- CONTROLES -->
+    <div id="controlsScreen" class="overlay">
+        <h1 style="color:#ffaa22;">CONTROLES</h1>
+        <div class="info-screen">
+            <h3 style="color:#ff6688;">📱 MÓVIL</h3>
+            <p>Joystick izquierdo: Mover</p>
+            <p>Botón ▶ : Correr</p>
+            <p>Botón ❚❚ : Pausar</p>
+            <h3 style="color:#ff6688; margin-top:20px;">💻 PC</h3>
+            <p>WASD / Flechas: Mover</p>
+            <p>Shift: Correr</p>
+            <p>ESC: Pausar</p>
+            <h3 style="color:#22ff66; margin-top:20px;">🎯 OBJETIVO</h3>
+            <p>Encuentra la <span style="color:#22ff66">SALIDA VERDE</span></p>
+            <p>Evita los juguetes enemigos</p>
+            <p>4 capítulos para escapar</p>
+        </div>
+        <button class="btn" onclick="hideOverlay('controlsScreen')">CERRAR</button>
+    </div>
+    
     <!-- JUEGO -->
     <div id="game">
         <canvas id="canvas"></canvas>
-        
         <div id="hud">
-            <div class="stat-bar health">
-                <span class="stat-icon">❤️</span>
-                <div class="stat-fill"><div class="stat-inner" id="healthFill"></div></div>
-            </div>
-            <div class="stat-bar stamina">
-                <span class="stat-icon">⚡</span>
-                <div class="stat-fill"><div class="stat-inner" id="staminaFill"></div></div>
-            </div>
-            <div class="stat-bar light">
-                <span class="stat-icon">🔦</span>
-                <div class="stat-fill"><div class="stat-inner" id="lightFill"></div></div>
-            </div>
+            <div class="stat health"><span>❤️</span><div class="stat-fill"><div class="stat-inner" id="healthFill"></div></div></div>
+            <div class="stat stamina"><span>⚡</span><div class="stat-fill"><div class="stat-inner" id="staminaFill"></div></div></div>
+            <div class="stat light"><span>🔦</span><div class="stat-fill"><div class="stat-inner" id="lightFill"></div></div></div>
         </div>
-        
         <div id="chapterInfo">CAPÍTULO 1</div>
-        
-        <!-- JOYSTICK MÓVIL -->
-        <div id="joystickArea">
-            <div class="joystick-outer" id="joystickOuter">
-                <div class="joystick-inner" id="joystickInner"></div>
-            </div>
-        </div>
-        
-        <!-- BOTONES MÓVIL -->
-        <div id="touchActions">
-            <button class="action-btn" id="btnRun">▶</button>
-            <button class="action-btn" id="btnPause">❚❚</button>
-        </div>
+        <div id="joystickArea"><div class="joystick-outer" id="joystickOuter"><div class="joystick-inner" id="joystickInner"></div></div></div>
+        <div id="touchActions"><button class="action-btn" id="btnRun">▶</button><button class="action-btn" id="btnPause">❚❚</button></div>
     </div>
     
     <!-- CAPÍTULO -->
-    <div id="chapterScreen">
-        <h1 id="chapTitle">CAPÍTULO 1</h1>
-        <h2 id="chapSub">La Entrada</h2>
-        <p>Toca para continuar...</p>
-    </div>
-    
-    <!-- PAUSA -->
-    <div id="pause" class="overlay">
-        <h1>PAUSA</h1>
-        <p>El juego está pausado</p>
-        <button class="btn" onclick="resumeGame()">▶ CONTINUAR</button>
-        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
-    </div>
-    
-    <!-- GAME OVER -->
-    <div id="gameOver" class="overlay">
-        <h1>GAME OVER</h1>
-        <p id="deathMsg">Te han atrapado...</p>
-        <button class="btn" onclick="startGame()">🔄 REINTENTAR</button>
-        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
-    </div>
-    
-    <!-- VICTORIA -->
-    <div id="victory" class="overlay">
-        <h1>¡ESCAPASTE!</h1>
-        <p>Sobreviviste a The Forgotten Playroom</p>
-        <button class="btn" onclick="startGame()">🔄 JUGAR DE NUEVO</button>
-        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
-    </div>
+    <div id="chapterScreen"><h1 id="chapTitle">CAPÍTULO 1</h1><h2 id="chapSub">La Entrada</h2><p>Toca para continuar...</p></div>
+    <div id="pause" class="overlay"><h1>PAUSA</h1><p>El juego está pausado</p><button class="btn" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
+    <div id="gameOver" class="overlay"><h1>GAME OVER</h1><p id="deathMsg">Te atraparon...</p><button class="btn" onclick="startGame()">🔄 REINTENTAR</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
+    <div id="victory" class="overlay"><h1>¡ESCAPASTE!</h1><p>Sobreviviste a The Forgotten Playroom</p><button class="btn" onclick="startGame()">🔄 JUGAR DE NUEVO</button><button class="btn" onclick="quitGame()">🏠 MENÚ</button></div>
 
     <script>
-    // =============================================
-    // THE FORGOTTEN PLAYROOM - PROFESSIONAL VERSION
-    // =============================================
+    // ============================================
+    // THE FORGOTTEN PLAYROOM - SPRITE ENGINE v2
+    // ============================================
     
-    // DETECTAR MÓVIL
-    const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                      ('ontouchstart' in window);
+    const IS_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) || ('ontouchstart' in window);
     
     // CONFIGURACIÓN
     const CONFIG = {
         PLAYER_SPEED: 4,
         PLAYER_RUN_SPEED: 7,
-        PLAYER_SIZE: 18,
-        ENEMY_SPEED: 1.0,
+        PLAYER_SIZE: 20,
+        ENEMY_SPEED: 1.2,
         ENEMY_DAMAGE: 8,
-        SAFE_DIST: 300,
+        SAFE_DIST: 350,
         LIGHT_RADIUS: 350,
         MIN_LIGHT: 150,
-        CHAPTERS: ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily'],
-        ENEMIES: ['🧸', '🦁', '🤖', '🐀', '🟢']
+        CHAPTERS: ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily']
     };
     
     // VARIABLES GLOBALES
     let canvas, ctx, W, H;
-    let state = 'menu';
-    let chapter = 1;
-    let player = null;
-    let enemies = [];
-    let exitZone = null;
-    let keys = {};
-    let joystick = { x: 0, y: 0 };
-    let running = false;
-    let invincible = false;
-    let invincibleTime = 0;
-    let frame = 0;
+    let state = 'menu', chapter = 1;
+    let player = null, enemies = [], exitZone = null;
+    let keys = {}, joystick = { x: 0, y: 0 }, running = false;
+    let invincible = false, invincibleTime = 0, frame = 0;
     
-    // INICIALIZACIÓN
+    // ============================================
+    // SPRITE DRAWING FUNCTIONS
+    // ============================================
+    
+    const Sprites = {
+        // JUGADOR (Detective)
+        drawPlayer(ctx, x, y, size, frame) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo
+            ctx.fillStyle = '#334455';
+            ctx.beginPath();
+            ctx.ellipse(0, 5, size * 0.8, size, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Cabeza
+            ctx.fillStyle = '#ddbb99';
+            ctx.beginPath();
+            ctx.arc(0, -size * 0.6, size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pelo
+            ctx.fillStyle = '#332211';
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.8, size * 0.5, size * 0.3, 0, 0, Math.PI);
+            ctx.fill();
+            
+            // Ojos
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(-size * 0.15, -size * 0.6, size * 0.12, 0, Math.PI * 2);
+            ctx.arc(size * 0.15, -size * 0.6, size * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#2255aa';
+            ctx.beginPath();
+            ctx.arc(-size * 0.15, -size * 0.55, size * 0.06, 0, Math.PI * 2);
+            ctx.arc(size * 0.15, -size * 0.55, size * 0.06, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Linterna (brillo)
+            ctx.fillStyle = 'rgba(255, 220, 100, 0.3)';
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        },
+        
+        // BOOGO (Peluche Azul)
+        drawBoogo(ctx, x, y, size, chasing) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo peluche
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+            gradient.addColorStop(0, '#4488ff');
+            gradient.addColorStop(1, '#224488');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, size, size * 1.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Peluche textura
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(-size + Math.random() * size * 2, -size + Math.random() * size * 2);
+                ctx.lineTo(-size + Math.random() * size * 2, -size + Math.random() * size * 2);
+                ctx.stroke();
+            }
+            
+            // Boca grande con dientes
+            ctx.fillStyle = '#220011';
+            ctx.beginPath();
+            ctx.ellipse(0, size * 0.2, size * 0.7, size * 0.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Dientes
+            ctx.fillStyle = '#fff';
+            for (let i = -3; i <= 3; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i * size * 0.15, size * 0.1);
+                ctx.lineTo(i * size * 0.15 - size * 0.05, size * 0.4);
+                ctx.lineTo(i * size * 0.15 + size * 0.05, size * 0.4);
+                ctx.fill();
+            }
+            
+            // Ojos vacíos
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.ellipse(-size * 0.35, -size * 0.2, size * 0.25, size * 0.35, 0, 0, Math.PI * 2);
+            ctx.ellipse(size * 0.35, -size * 0.2, size * 0.25, size * 0.35, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pupilas rojas si persigue
+            if (chasing) {
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(-size * 0.35, -size * 0.2, size * 0.08, 0, Math.PI * 2);
+                ctx.arc(size * 0.35, -size * 0.2, size * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        },
+        
+        // CATSTAR (León)
+        drawCatstar(ctx, x, y, size, chasing) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Melena
+            ctx.fillStyle = '#dd8822';
+            for (let i = 0; i < 12; i++) {
+                const angle = (i / 12) * Math.PI * 2;
+                ctx.beginPath();
+                ctx.ellipse(Math.cos(angle) * size * 0.8, Math.sin(angle) * size * 0.8, size * 0.4, size * 0.2, angle, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Cara
+            ctx.fillStyle = '#ffcc66';
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ojos
+            ctx.fillStyle = chasing ? '#ff0000' : '#665522';
+            ctx.beginPath();
+            ctx.ellipse(-size * 0.25, -size * 0.1, size * 0.15, size * 0.2, 0, 0, Math.PI * 2);
+            ctx.ellipse(size * 0.25, -size * 0.1, size * 0.15, size * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Nariz
+            ctx.fillStyle = '#ff8866';
+            ctx.beginPath();
+            ctx.arc(0, size * 0.15, size * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Boca con dientes
+            ctx.fillStyle = '#330011';
+            ctx.beginPath();
+            ctx.arc(0, size * 0.3, size * 0.25, 0, Math.PI);
+            ctx.fill();
+            
+            // Dientes
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.15, size * 0.3);
+            ctx.lineTo(-size * 0.08, size * 0.5);
+            ctx.lineTo(0, size * 0.3);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(size * 0.15, size * 0.3);
+            ctx.lineTo(size * 0.08, size * 0.5);
+            ctx.lineTo(0, size * 0.3);
+            ctx.fill();
+            
+            ctx.restore();
+        },
+        
+        // 1028 (Robot)
+        draw1028(ctx, x, y, size, chasing) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo metálico
+            const gradient = ctx.createLinearGradient(-size, -size, size, size);
+            gradient.addColorStop(0, '#556677');
+            gradient.addColorStop(0.5, '#8899aa');
+            gradient.addColorStop(1, '#445566');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-size * 0.8, -size * 0.5, size * 1.6, size * 1.2);
+            
+            // Pantalla LED en pecho
+            ctx.fillStyle = '#000';
+            ctx.fillRect(-size * 0.4, size * 0.1, size * 0.8, size * 0.35);
+            
+            // Carita en pantalla
+            ctx.fillStyle = chasing ? '#ff0000' : '#00ff00';
+            ctx.font = `${size * 0.4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText(chasing ? '>:)' : ':)', 0, size * 0.38);
+            
+            // Cabeza
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, -size * 0.5, size * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ojos LED
+            ctx.fillStyle = chasing ? '#ff0000' : '#00aaff';
+            ctx.beginPath();
+            ctx.arc(-size * 0.2, -size * 0.55, size * 0.12, 0, Math.PI * 2);
+            ctx.arc(size * 0.2, -size * 0.55, size * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Antena
+            ctx.strokeStyle = '#aabbcc';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.9);
+            ctx.lineTo(0, -size * 1.1);
+            ctx.stroke();
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath();
+            ctx.arc(0, -size * 1.1, size * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        },
+        
+        // RATUILE (Rata)
+        drawRatuile(ctx, x, y, size, state) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo
+            ctx.fillStyle = '#887766';
+            ctx.beginPath();
+            ctx.ellipse(0, 0, size * 0.9, size * 0.7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Orejas
+            ctx.fillStyle = '#aa9988';
+            ctx.beginPath();
+            ctx.ellipse(-size * 0.5, -size * 0.5, size * 0.3, size * 0.25, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(size * 0.5, -size * 0.5, size * 0.3, size * 0.25, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Cara
+            ctx.fillStyle = '#bbab98';
+            ctx.beginPath();
+            ctx.arc(0, size * 0.1, size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ojos según estado
+            if (state === 'happy') {
+                ctx.fillStyle = '#44aa44';
+                ctx.beginPath();
+                ctx.arc(-size * 0.2, -size * 0.05, size * 0.12, 0, Math.PI * 2);
+                ctx.arc(size * 0.2, -size * 0.05, size * 0.12, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state === 'sad') {
+                ctx.fillStyle = '#4444aa';
+                ctx.beginPath();
+                ctx.ellipse(-size * 0.2, -size * 0.05, size * 0.12, size * 0.08, 0, 0, Math.PI * 2);
+                ctx.ellipse(size * 0.2, -size * 0.05, size * 0.12, size * 0.08, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else { // angry
+                ctx.fillStyle = '#ff4444';
+                ctx.beginPath();
+                ctx.arc(-size * 0.2, -size * 0.05, size * 0.15, 0, Math.PI * 2);
+                ctx.arc(size * 0.2, -size * 0.05, size * 0.15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Nariz
+            ctx.fillStyle = '#ff8888';
+            ctx.beginPath();
+            ctx.arc(0, size * 0.15, size * 0.12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Bigotes
+            ctx.strokeStyle = '#665544';
+            ctx.lineWidth = 1;
+            for (let i = -2; i <= 2; i++) {
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.3, size * 0.2);
+                ctx.lineTo(-size * 0.9, size * 0.2 + i * size * 0.08);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(size * 0.3, size * 0.2);
+                ctx.lineTo(size * 0.9, size * 0.2 + i * size * 0.08);
+                ctx.stroke();
+            }
+            
+            // Cola
+            ctx.strokeStyle = '#665544';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(size * 0.7, 0);
+            ctx.quadraticCurveTo(size * 1.2, -size * 0.3, size * 1.1, size * 0.5);
+            ctx.stroke();
+            
+            ctx.restore();
+        },
+        
+        // SLIMER (Masa Verde)
+        drawSlimer(ctx, x, y, size, frame) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo gelatinoso (animación)
+            const wobble = Math.sin(frame * 0.1) * size * 0.1;
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.3);
+            gradient.addColorStop(0, '#88ff44');
+            gradient.addColorStop(0.5, '#66cc22');
+            gradient.addColorStop(1, '#448811');
+            ctx.fillStyle = gradient;
+            
+            ctx.beginPath();
+            ctx.ellipse(wobble, 0, size * 1.1 + wobble * 0.5, size * 0.9 + wobble * 0.3, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ojo grande
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(-size * 0.2 + wobble * 0.5, -size * 0.15, size * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pupila
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-size * 0.2 + wobble * 0.5, -size * 0.15, size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Boca goteando
+            ctx.fillStyle = '#55aa00';
+            ctx.beginPath();
+            ctx.ellipse(0, size * 0.4, size * 0.3, size * 0.15, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        },
+        
+        // TECNO PLAYER (Aliado)
+        drawTecno(ctx, x, y, size) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Cuerpo metálico
+            const gradient = ctx.createLinearGradient(-size, -size, size, size);
+            gradient.addColorStop(0, '#445566');
+            gradient.addColorStop(0.5, '#6688aa');
+            gradient.addColorStop(1, '#334455');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-size * 0.6, -size * 0.2, size * 1.2, size * 1);
+            
+            // Pantalla TV (cabeza)
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.roundRect(-size * 0.7, -size * 0.9, size * 1.4, size * 0.8, 5);
+            ctx.fill();
+            
+            // Pantalla
+            ctx.fillStyle = '#001a11';
+            ctx.fillRect(-size * 0.55, -size * 0.8, size * 1.1, size * 0.6);
+            
+            // Cara feliz en pantalla
+            ctx.fillStyle = '#00ff88';
+            ctx.font = `${size * 0.5}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.fillText(':)', 0, -size * 0.35);
+            
+            // Antena
+            ctx.fillStyle = '#00ff88';
+            ctx.beginPath();
+            ctx.arc(0, -size * 1.05, size * 0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        },
+        
+        // EMILY (Boss Final)
+        drawEmily(ctx, x, y, size, phase) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Vestido rojo
+            ctx.fillStyle = '#aa1122';
+            ctx.beginPath();
+            ctx.moveTo(-size * 0.4, size * 0.3);
+            ctx.lineTo(-size * 0.8, size * 1.2);
+            ctx.lineTo(size * 0.8, size * 1.2);
+            ctx.lineTo(size * 0.4, size * 0.3);
+            ctx.fill();
+            
+            // Cuerpo
+            ctx.fillStyle = '#ddccaa';
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.1, size * 0.35, size * 0.45, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Cabeza de porcelana
+            const faceGradient = ctx.createRadialGradient(0, -size * 0.7, 0, 0, -size * 0.7, size * 0.6);
+            faceGradient.addColorStop(0, '#fff8f0');
+            faceGradient.addColorStop(1, '#ddc8b8');
+            ctx.fillStyle = faceGradient;
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.7, size * 0.45, size * 0.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Pelo
+            ctx.fillStyle = '#221100';
+            ctx.beginPath();
+            ctx.ellipse(0, -size * 0.9, size * 0.5, size * 0.3, 0, 0, Math.PI);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(-size * 0.4, -size * 0.65, size * 0.15, size * 0.4, -0.2, 0, Math.PI * 2);
+            ctx.ellipse(size * 0.4, -size * 0.65, size * 0.15, size * 0.4, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ojos (sangrantes si está en fase 2+)
+            if (phase >= 2) {
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.2, -size * 0.6);
+                ctx.lineTo(-size * 0.15, -size * 0.4);
+                ctx.lineTo(-size * 0.25, -size * 0.4);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(size * 0.2, -size * 0.6);
+                ctx.lineTo(size * 0.15, -size * 0.4);
+                ctx.lineTo(size * 0.25, -size * 0.4);
+                ctx.fill();
+            }
+            
+            ctx.fillStyle = '#111';
+            ctx.beginPath();
+            ctx.ellipse(-size * 0.15, -size * 0.75, size * 0.08, size * 0.1, 0, 0, Math.PI * 2);
+            ctx.ellipse(size * 0.15, -size * 0.75, size * 0.08, size * 0.1, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Boca cosida (abierta en fase 3)
+            if (phase >= 3) {
+                ctx.fillStyle = '#330011';
+                ctx.beginPath();
+                ctx.arc(0, -size * 0.55, size * 0.2, 0, Math.PI);
+                ctx.fill();
+                // Dientes
+                ctx.fillStyle = '#fff';
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.rect(i * size * 0.08 - size * 0.03, -size * 0.55, size * 0.06, size * 0.08);
+                    ctx.fill();
+                }
+            } else {
+                ctx.strokeStyle = '#884433';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.15, -size * 0.55);
+                ctx.lineTo(size * 0.15, -size * 0.55);
+                ctx.stroke();
+                // Puntos de costura
+                ctx.fillStyle = '#884433';
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.arc(i * size * 0.075, -size * 0.55, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            ctx.restore();
+        },
+        
+        // SALIDA
+        drawExit(ctx, x, y, radius) {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            // Brillo verde
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radius * 2);
+            gradient.addColorStop(0, 'rgba(0,255,100,0.4)');
+            gradient.addColorStop(1, 'rgba(0,255,100,0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Círculo principal
+            ctx.strokeStyle = '#00ff66';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 0, radius, 0, Math.PI * 2);
+            ctx.stroke();
+            
+            // Puerta
+            ctx.fillStyle = '#00aa44';
+            ctx.beginPath();
+            ctx.roundRect(-radius * 0.4, -radius * 0.6, radius * 0.8, radius * 1.2, 5);
+            ctx.fill();
+            
+            // Manija
+            ctx.fillStyle = '#ffcc00';
+            ctx.beginPath();
+            ctx.arc(radius * 0.2, 0, radius * 0.1, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Flecha
+            ctx.fillStyle = '#00ff66';
+            ctx.font = `bold ${radius * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🚪', 0, 0);
+            
+            ctx.restore();
+        }
+    };
+    
+    // ============================================
+    // GAME LOGIC
+    // ============================================
+    
     function init() {
         canvas = document.getElementById('canvas');
         ctx = canvas.getContext('2d');
         resize();
         window.addEventListener('resize', resize);
         setupInput();
+        drawCharacterPreviews();
         
         if (IS_MOBILE) {
             document.getElementById('joystickArea').classList.add('active');
@@ -470,7 +835,25 @@
         }
         
         requestAnimationFrame(gameLoop);
-        console.log('🎮 Game ready - Mobile:', IS_MOBILE);
+    }
+    
+    function drawCharacterPreviews() {
+        // Previews para la pantalla de personajes
+        ['Player', 'Tecno', 'Boogo', 'Catstar', '1028', 'Ratuile', 'Slimer', 'Emily'].forEach(name => {
+            const canvas = document.getElementById('preview' + name);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 50, 50);
+            
+            if (name === 'Player') Sprites.drawPlayer(ctx, 25, 25, 12, 0);
+            else if (name === 'Tecno') Sprites.drawTecno(ctx, 25, 28, 15);
+            else if (name === 'Boogo') Sprites.drawBoogo(ctx, 25, 25, 12, false);
+            else if (name === 'Catstar') Sprites.drawCatstar(ctx, 25, 25, 12, false);
+            else if (name === '1028') Sprites.draw1028(ctx, 25, 25, 12, false);
+            else if (name === 'Ratuile') Sprites.drawRatuile(ctx, 25, 25, 12, 'happy');
+            else if (name === 'Slimer') Sprites.drawSlimer(ctx, 25, 25, 12, 0);
+            else if (name === 'Emily') Sprites.drawEmily(ctx, 25, 30, 15, 1);
+        });
     }
     
     function resize() {
@@ -478,9 +861,7 @@
         H = canvas.height = window.innerHeight;
     }
     
-    // INPUT
     function setupInput() {
-        // Teclado
         window.addEventListener('keydown', e => {
             keys[e.code] = true;
             if (e.code === 'Escape') {
@@ -490,7 +871,6 @@
         });
         window.addEventListener('keyup', e => keys[e.code] = false);
         
-        // Capítulo click
         document.getElementById('chapterScreen').addEventListener('click', () => {
             document.getElementById('chapterScreen').classList.remove('active');
         });
@@ -503,9 +883,8 @@
         
         const handleJoystick = (x, y) => {
             const rect = outer.getBoundingClientRect();
-            const max = rect.width / 2 - 30;
-            let dx = x - center.x;
-            let dy = y - center.y;
+            const max = rect.width / 2 - 27;
+            let dx = x - center.x, dy = y - center.y;
             const dist = Math.hypot(dx, dy);
             if (dist > max) { dx = dx / dist * max; dy = dy / dist * max; }
             inner.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
@@ -520,57 +899,39 @@
             center = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
             handleJoystick(e.touches[0].clientX, e.touches[0].clientY);
         });
-        outer.addEventListener('touchmove', e => {
-            e.preventDefault();
-            if (active) handleJoystick(e.touches[0].clientX, e.touches[0].clientY);
-        });
-        outer.addEventListener('touchend', e => {
-            e.preventDefault();
-            active = false;
-            joystick = { x: 0, y: 0 };
-            inner.style.transform = 'translate(-50%, -50%)';
-        });
+        outer.addEventListener('touchmove', e => { e.preventDefault(); if (active) handleJoystick(e.touches[0].clientX, e.touches[0].clientY); });
+        outer.addEventListener('touchend', e => { e.preventDefault(); active = false; joystick = { x: 0, y: 0 }; inner.style.transform = 'translate(-50%, -50%)'; });
         
-        // Botones móviles
+        // Botones
         const btnRun = document.getElementById('btnRun');
-        btnRun.addEventListener('touchstart', e => { e.preventDefault(); running = true; btnRun.style.background = '#ff3333'; });
+        btnRun.addEventListener('touchstart', e => { e.preventDefault(); running = true; btnRun.style.background = '#ff2244'; });
         btnRun.addEventListener('touchend', e => { e.preventDefault(); running = false; btnRun.style.background = ''; });
         
-        document.getElementById('btnPause').addEventListener('touchstart', e => {
-            e.preventDefault();
-            if (state === 'playing') pauseGame();
-            else if (state === 'paused') resumeGame();
-        });
+        document.getElementById('btnPause').addEventListener('touchstart', e => { e.preventDefault(); if (state === 'playing') pauseGame(); else if (state === 'paused') resumeGame(); });
     }
     
-    // OVERLAYS
     function showOverlay(id) { document.getElementById(id).classList.add('active'); }
     function hideOverlay(id) { document.getElementById(id).classList.remove('active'); }
-    
     function pauseGame() { if (state === 'playing') { state = 'paused'; showOverlay('pause'); } }
     function resumeGame() { state = 'playing'; hideOverlay('pause'); }
     function quitGame() {
         state = 'menu';
         document.getElementById('menu').classList.remove('hidden');
         document.getElementById('game').classList.remove('active');
-        hideOverlay('pause');
-        hideOverlay('gameOver');
-        hideOverlay('victory');
+        hideOverlay('pause'); hideOverlay('gameOver'); hideOverlay('victory');
     }
     
-    // INICIO
     function startGame() {
         state = 'playing';
         chapter = 1;
         player = { x: W/2, y: H/2, hp: 100, stamina: 100, light: 100 };
         spawnEnemies();
-        exitZone = { x: W - 80, y: H - 80, r: 45 };
+        exitZone = { x: W - 100, y: H - 100, r: 50 };
         invincible = false;
         
         document.getElementById('menu').classList.add('hidden');
         document.getElementById('game').classList.add('active');
-        hideOverlay('gameOver');
-        hideOverlay('victory');
+        hideOverlay('gameOver'); hideOverlay('victory');
         
         if (IS_MOBILE) {
             document.getElementById('joystickArea').classList.add('active');
@@ -588,7 +949,9 @@
     
     function spawnEnemies() {
         enemies = [];
-        const count = chapter + 1;
+        const count = Math.min(chapter + 1, 5);
+        const types = ['boogo', 'catstar', '1028', 'ratuile', 'slimer'];
+        
         for (let i = 0; i < count; i++) {
             let x, y;
             do {
@@ -598,35 +961,31 @@
             
             enemies.push({
                 x, y,
-                type: CONFIG.ENEMIES[i % CONFIG.ENEMIES.length],
-                speed: CONFIG.ENEMY_SPEED + chapter * 0.1,
+                type: types[i % types.length],
+                speed: CONFIG.ENEMY_SPEED + chapter * 0.15,
                 angle: Math.random() * Math.PI * 2,
-                chasing: false
+                chasing: false,
+                state: 'happy' // para ratuile
             });
         }
     }
     
     function nextChapter() {
         chapter++;
-        if (chapter > 4) {
-            state = 'victory';
-            showOverlay('victory');
-        } else {
-            player.x = W/2;
-            player.y = H/2;
-            player.hp = Math.min(100, player.hp + 20);
+        if (chapter > 4) { state = 'victory'; showOverlay('victory'); }
+        else {
+            player.x = W/2; player.y = H/2;
+            player.hp = Math.min(100, player.hp + 25);
             player.light = 100;
             spawnEnemies();
             showChapter();
         }
     }
     
-    // UPDATE
     function update() {
         if (state !== 'playing') return;
         frame++;
         
-        // Invencibilidad
         if (invincible) { invincibleTime--; if (invincibleTime <= 0) invincible = false; }
         
         // Movimiento
@@ -636,8 +995,7 @@
         if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
         if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
         if (IS_MOBILE && (Math.abs(joystick.x) > 0.1 || Math.abs(joystick.y) > 0.1)) {
-            dx = joystick.x;
-            dy = joystick.y;
+            dx = joystick.x; dy = joystick.y;
         }
         
         const mag = Math.hypot(dx, dy);
@@ -660,7 +1018,7 @@
         enemies.forEach(e => {
             const dist = Math.hypot(player.x - e.x, player.y - e.y);
             
-            if (dist < 250 && player.light > 20) {
+            if (dist < 250 && player.light > 15) {
                 e.chasing = true;
                 const angle = Math.atan2(player.y - e.y, player.x - e.x);
                 e.x += Math.cos(angle) * e.speed * 1.5;
@@ -677,13 +1035,19 @@
             e.x = Math.max(30, Math.min(W - 30, e.x));
             e.y = Math.max(30, Math.min(H - 30, e.y));
             
+            // Cambiar estado de Ratuile aleatoriamente
+            if (e.type === 'ratuile' && Math.random() < 0.01) {
+                const states = ['happy', 'sad', 'angry'];
+                e.state = states[Math.floor(Math.random() * 3)];
+            }
+            
             if (dist < 35 && !invincible) {
                 player.hp -= CONFIG.ENEMY_DAMAGE;
                 invincible = true;
                 invincibleTime = 60;
                 const push = Math.atan2(player.y - e.y, player.x - e.x);
-                e.x -= Math.cos(push) * 50;
-                e.y -= Math.sin(push) * 50;
+                e.x -= Math.cos(push) * 60;
+                e.y -= Math.sin(push) * 60;
             }
         });
         
@@ -695,7 +1059,7 @@
         // Game Over
         if (player.hp <= 0) {
             state = 'gameover';
-            const msgs = ['Te atrapó Boogo...', 'Catstar te alcanzó...', '1028 te traicionó...', 'Ratuile te mordió...', 'Slimer te absorbió...'];
+            const msgs = ['Boogo te atrapó...', 'Catstar te arañó...', '1028 te traicionó...', 'Ratuile te mordió...', 'Slimer te absorbió...'];
             document.getElementById('deathMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
             showOverlay('gameOver');
         }
@@ -707,130 +1071,87 @@
         document.getElementById('chapterInfo').textContent = 'CAPÍTULO ' + chapter;
     }
     
-    // DRAW
     function draw() {
-        ctx.fillStyle = '#050505';
+        ctx.fillStyle = '#0a0008';
         ctx.fillRect(0, 0, W, H);
         
         if (state !== 'playing' && state !== 'paused') return;
         
-        // Grid floor
-        ctx.strokeStyle = '#111';
+        // Suelo con patrón
+        ctx.strokeStyle = '#150510';
         ctx.lineWidth = 1;
-        for (let x = 0; x < W; x += 50) {
+        for (let x = 0; x < W; x += 60) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
         }
-        for (let y = 0; y < H; y += 50) {
+        for (let y = 0; y < H; y += 60) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
         }
         
-        // Exit zone
-        ctx.beginPath();
-        ctx.arc(exitZone.x, exitZone.y, exitZone.r + 10, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(0, 255, 0, 0.15)';
-        ctx.fill();
-        ctx.strokeStyle = '#00ff00';
-        ctx.lineWidth = 3;
-        ctx.stroke();
+        // Salida
+        Sprites.drawExit(ctx, exitZone.x, exitZone.y, exitZone.r);
         
-        ctx.font = 'bold 28px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#00ff00';
-        ctx.fillText('SALIDA', exitZone.x, exitZone.y);
-        
-        // Enemies
+        // Enemigos
         const lightR = Math.max(CONFIG.MIN_LIGHT, CONFIG.LIGHT_RADIUS * (player.light / 100));
-        ctx.font = '40px Arial';
         enemies.forEach(e => {
             if (Math.hypot(player.x - e.x, player.y - e.y) < lightR) {
-                ctx.fillText(e.type, e.x, e.y + 15);
-                if (e.chasing) {
-                    ctx.fillStyle = '#ff0000';
-                    ctx.beginPath();
-                    ctx.arc(e.x, e.y - 30, 5, 0, Math.PI * 2);
-                    ctx.fill();
+                switch (e.type) {
+                    case 'boogo': Sprites.drawBoogo(ctx, e.x, e.y, 25, e.chasing); break;
+                    case 'catstar': Sprites.drawCatstar(ctx, e.x, e.y, 22, e.chasing); break;
+                    case '1028': Sprites.draw1028(ctx, e.x, e.y, 22, e.chasing); break;
+                    case 'ratuile': Sprites.drawRatuile(ctx, e.x, e.y, 20, e.state); break;
+                    case 'slimer': Sprites.drawSlimer(ctx, e.x, e.y, 22, frame); break;
                 }
             }
         });
         
-        // Player
+        // Jugador
         if (!invincible || Math.floor(frame / 4) % 2 === 0) {
-            // Cuerpo
-            ctx.fillStyle = '#4488ff';
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, CONFIG.PLAYER_SIZE, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Destello
-            ctx.fillStyle = '#88bbff';
-            ctx.beginPath();
-            ctx.arc(player.x - 5, player.y - 5, 5, 0, Math.PI * 2);
-            ctx.fill();
+            Sprites.drawPlayer(ctx, player.x, player.y, CONFIG.PLAYER_SIZE, frame);
         }
         
-        // Invencibilidad ring
+        // Invencibilidad
         if (invincible) {
-            ctx.strokeStyle = 'rgba(255, 200, 0, 0.7)';
+            ctx.strokeStyle = 'rgba(255, 200, 0, 0.6)';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(player.x, player.y, CONFIG.PLAYER_SIZE + 8 + Math.sin(frame * 0.2) * 3, 0, Math.PI * 2);
+            ctx.arc(player.x, player.y, CONFIG.PLAYER_SIZE + 10 + Math.sin(frame * 0.3) * 5, 0, Math.PI * 2);
             ctx.stroke();
         }
         
-        // Light effect
+        // Luz
         ctx.save();
         ctx.globalCompositeOperation = 'destination-out';
-        const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, lightR);
-        grad.addColorStop(0, 'rgba(0,0,0,1)');
-        grad.addColorStop(0.6, 'rgba(0,0,0,0.8)');
-        grad.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = grad;
+        const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, lightR);
+        gradient.addColorStop(0, 'rgba(0,0,0,1)');
+        gradient.addColorStop(0.6, 'rgba(0,0,0,0.85)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(player.x, player.y, lightR, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
         
-        // Exit glow
-        const exitDist = Math.hypot(player.x - exitZone.x, player.y - exitZone.y);
-        if (exitDist < 200) {
+        // Luz en salida
+        if (Math.hypot(player.x - exitZone.x, player.y - exitZone.y) < 250) {
             ctx.save();
             ctx.globalCompositeOperation = 'destination-out';
-            const eg = ctx.createRadialGradient(exitZone.x, exitZone.y, 0, exitZone.x, exitZone.y, 80);
+            const eg = ctx.createRadialGradient(exitZone.x, exitZone.y, 0, exitZone.x, exitZone.y, 100);
             eg.addColorStop(0, 'rgba(0,0,0,0.6)');
             eg.addColorStop(1, 'rgba(0,0,0,0)');
             ctx.fillStyle = eg;
             ctx.beginPath();
-            ctx.arc(exitZone.x, exitZone.y, 80, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-        
-        // Arrow to exit (if far)
-        if (exitDist > 300) {
-            const angle = Math.atan2(exitZone.y - player.y, exitZone.x - player.x);
-            ctx.save();
-            ctx.translate(player.x + Math.cos(angle) * 50, player.y + Math.sin(angle) * 50);
-            ctx.rotate(angle);
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
-            ctx.beginPath();
-            ctx.moveTo(12, 0);
-            ctx.lineTo(-8, -6);
-            ctx.lineTo(-8, 6);
-            ctx.closePath();
+            ctx.arc(exitZone.x, exitZone.y, 100, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
         }
     }
     
-    // GAME LOOP
     function gameLoop() {
         update();
         draw();
         requestAnimationFrame(gameLoop);
     }
     
-    // START
     window.addEventListener('load', init);
     </script>
 </body>
