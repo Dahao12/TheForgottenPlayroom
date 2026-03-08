@@ -5,28 +5,21 @@ class InputHandler {
         this.mouse = { x: 0, y: 0, clicked: false };
         this.previousKeys = {};
         
-        // Keyboard events
-        window.addEventListener('keydown', (e) => {
-            this.keys[e.code] = true;
-        });
+        // Bind events immediately
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleKeyUp = this.handleKeyUp.bind(this);
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
+        this.handleMouseUp = this.handleMouseUp.bind(this);
         
-        window.addEventListener('keyup', (e) => {
-            this.keys[e.code] = false;
-        });
+        // Keyboard events
+        window.addEventListener('keydown', this.handleKeyDown);
+        window.addEventListener('keyup', this.handleKeyUp);
         
         // Mouse events
-        window.addEventListener('mousemove', (e) => {
-            this.mouse.x = e.clientX;
-            this.mouse.y = e.clientY;
-        });
-        
-        window.addEventListener('mousedown', (e) => {
-            this.mouse.clicked = true;
-        });
-        
-        window.addEventListener('mouseup', (e) => {
-            this.mouse.clicked = false;
-        });
+        window.addEventListener('mousemove', this.handleMouseMove);
+        window.addEventListener('mousedown', this.handleMouseDown);
+        window.addEventListener('mouseup', this.handleMouseUp);
         
         // Touch events for mobile
         window.addEventListener('touchstart', (e) => {
@@ -47,6 +40,34 @@ class InputHandler {
                 this.mouse.y = e.touches[0].clientY;
             }
         });
+        
+        console.log('✅ InputHandler initialized');
+    }
+    
+    handleKeyDown(e) {
+        this.keys[e.code] = true;
+        // Prevent default for game keys
+        if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyE', 'KeyF', 'Space', 'Escape', 
+             'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+            e.preventDefault();
+        }
+    }
+    
+    handleKeyUp(e) {
+        this.keys[e.code] = false;
+    }
+    
+    handleMouseMove(e) {
+        this.mouse.x = e.clientX;
+        this.mouse.y = e.clientY;
+    }
+    
+    handleMouseDown(e) {
+        this.mouse.clicked = true;
+    }
+    
+    handleMouseUp(e) {
+        this.mouse.clicked = false;
     }
     
     isKeyPressed(keyCode) {
@@ -55,6 +76,11 @@ class InputHandler {
     
     wasKeyJustPressed(keyCode) {
         return this.keys[keyCode] === true && this.previousKeys[keyCode] !== true;
+    }
+    
+    // Alias for compatibility
+    wasKeyJustPress(keyCode) {
+        return this.wasKeyJustPressed(keyCode);
     }
     
     isMoving() {
@@ -78,6 +104,14 @@ class InputHandler {
         if (this.isKeyPressed(KEYS.D) || this.isKeyPressed(KEYS.ARROW_RIGHT)) dx += 1;
         
         return normalize(dx, dy);
+    }
+    
+    // Simulate a key press (for mobile controls)
+    simulateKey(keyCode) {
+        this.keys[keyCode] = true;
+        setTimeout(() => {
+            this.keys[keyCode] = false;
+        }, 100);
     }
     
     update() {

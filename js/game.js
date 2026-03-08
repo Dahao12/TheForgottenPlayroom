@@ -39,22 +39,30 @@ class Game {
     }
     
     init() {
-        console.log('Initializing The Forgotten Playroom...');
+        console.log('🎮 Initializing The Forgotten Playroom...');
         
-        // Set up event listeners
-        window.addEventListener('resize', () => this.resize());
-        document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
-        
-        // Initialize audio context on first interaction
-        document.addEventListener('click', () => {
-            if (this.audio.sfxVolume > 0) {
-                // Enable audio
-            }
-        }, { once: true });
-        
-        this.resize();
-        this.showMenu();
-        this.gameLoop();
+        try {
+            // Set up event listeners
+            window.addEventListener('resize', () => this.resize());
+            document.addEventListener('visibilitychange', () => this.handleVisibilityChange());
+            
+            // Initialize audio context on first interaction
+            document.addEventListener('click', () => {
+                console.log('🔊 Audio enabled');
+            }, { once: true });
+            
+            this.resize();
+            console.log('✅ Canvas resized to:', this.width, 'x', this.height);
+            
+            this.showMenu();
+            console.log('✅ Menu shown');
+            
+            this.gameLoop();
+            console.log('✅ Game loop started');
+        } catch (error) {
+            console.error('❌ Error initializing game:', error);
+            alert('Error al iniciar el juego: ' + error.message);
+        }
     }
     
     resize() {
@@ -76,19 +84,33 @@ class Game {
     }
     
     startNewGame() {
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('game-over-screen').classList.add('hidden');
-        document.getElementById('victory-screen').classList.add('hidden');
+        console.log('🎮 Starting new game...');
         
-        this.currentChapter = 1;
-        this.deaths = 0;
-        this.startTime = Date.now();
-        this.gameOver = false;
-        this.victory = false;
-        this.inventory = [];
-        
-        this.loadChapter(1);
-        this.state = GAME_STATES.PLAYING;
+        try {
+            // Hide all menus
+            document.getElementById('main-menu')?.classList.add('hidden');
+            document.getElementById('game-over-screen')?.classList.add('hidden');
+            document.getElementById('victory-screen')?.classList.add('hidden');
+            document.getElementById('chapter-screen')?.classList.add('hidden');
+            
+            // Show game container
+            document.getElementById('game-container')?.classList.remove('hidden');
+            
+            this.currentChapter = 1;
+            this.deaths = 0;
+            this.startTime = Date.now();
+            this.gameOver = false;
+            this.victory = false;
+            this.inventory = [];
+            
+            this.loadChapter(1);
+            this.state = GAME_STATES.PLAYING;
+            
+            console.log('✅ Game started successfully');
+        } catch (error) {
+            console.error('❌ Error starting game:', error);
+            alert('Error al iniciar el juego: ' + error.message);
+        }
     }
     
     loadChapter(chapterNum) {
