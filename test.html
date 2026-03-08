@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TEST - The Forgotten Playroom</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #0a0008; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+        h1 { color: #ff2244; margin-bottom: 20px; }
+        .btn {
+            padding: 20px 40px;
+            margin: 10px;
+            background: #2a1525;
+            border: 2px solid #ff2244;
+            color: #fff;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:active { background: #ff2244; }
+        #result { margin-top: 20px; padding: 20px; background: #1a0a15; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 TEST BOTONES</h1>
+    <p style="margin-bottom:20px;">Toca cada botón para verificar</p>
+    
+    <button class="btn" id="btn1">BOTÓN 1: onclick</button>
+    <button class="btn" id="btn2">BOTÓN 2: addEventListener</button>
+    <button class="btn" ontouchstart="this.style.background='#ff2244'" ontouchend="testTouch()">BOTÓN 3: ontouchstart</button>
+    <a href="javascript:void(0)" onclick="alert('Funciona!'); return false;" style="display:inline-block;padding:20px 40px;background:#2a1525;border:2px solid #ff2244;color:#fff;font-size:18px;border-radius:5px;margin:10px;text-decoration:none;">BOTÓN 4: href javascript</a>
+    
+    <div id="result">Resultados:</div>
+    
+    <script>
+        // Test 1: onclick directo
+        document.getElementById('btn1').onclick = function() {
+            document.getElementById('result').innerHTML += '<br>✅ Botón 1 funciona (onclick)';
+        };
+        
+        // Test 2: addEventListener
+        document.getElementById('btn2').addEventListener('click', function() {
+            document.getElementById('result').innerHTML += '<br>✅ Botón 2 funciona (addEventListener)';
+        });
+        
+        // Test 3: ontouchstart
+        function testTouch() {
+            document.getElementById('result').innerHTML += '<br>✅ Botón 3 funciona (ontouchstart)';
+        }
+        
+        // Log inicial
+        document.getElementById('result').innerHTML += '<br>📱 JavaScript cargado';
+        document.getElementById('result').innerHTML += '<br>📱 Touch support: ' + ('ontouchstart' in window);
+        document.getElementById('result').innerHTML += '<br>📱 User Agent: ' + navigator.userAgent.substring(0, 50) + '...';
+    </script>
+</body>
+</html>
