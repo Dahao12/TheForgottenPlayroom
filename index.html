@@ -2,392 +2,766 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>The Forgotten Playroom</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/menu.css">
-    <link rel="stylesheet" href="css/mobile.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Main Menu */
+        #main-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+            z-index: 100;
+        }
+        
+        #main-menu.hidden {
+            display: none;
+        }
+        
+        .game-title {
+            font-size: 3rem;
+            color: #FFD700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            margin-bottom: 10px;
+            text-align: center;
+            animation: flicker 3s infinite;
+        }
+        
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+            52% { opacity: 1; }
+            54% { opacity: 0.6; }
+            56% { opacity: 1; }
+        }
+        
+        .game-subtitle {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .menu-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 2px solid #FFD700;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            min-width: 250px;
+        }
+        
+        .menu-btn:hover, .menu-btn:active {
+            background: linear-gradient(135deg, #16213e, #1a1a2e);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        
+        .warning-text {
+            margin-top: 30px;
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        /* Game Container */
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        
+        #game-container.active {
+            display: block;
+        }
+        
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            background: #0a0a0a;
+        }
+        
+        /* HUD */
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+        
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        
+        .hud-label {
+            font-size: 14px;
+            min-width: 70px;
+        }
+        
+        .bar-container {
+            width: 100px;
+            height: 12px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        
+        #health-fill { background: linear-gradient(to right, #ff0000, #00ff00); }
+        #stamina-fill { background: #00aaff; }
+        #battery-fill { background: linear-gradient(to right, #ffaa00, #ffff00); }
+        
+        #hud-chapter {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        /* Touch Controls */
+        #touch-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 50;
+            pointer-events: none;
+        }
+        
+        .controls-left, .controls-right {
+            pointer-events: auto;
+        }
+        
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 55px);
+            grid-template-rows: repeat(3, 55px);
+            gap: 5px;
+        }
+        
+        .dpad-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .dpad-btn:active {
+            background: rgba(255, 215, 0, 0.5);
+            border-color: #FFD700;
+        }
+        
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-center { grid-column: 2; grid-row: 2; background: transparent; border: none; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .action-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        
+        .action-btn:active {
+            background: rgba(255, 215, 0, 0.5);
+            border-color: #FFD700;
+            transform: scale(0.95);
+        }
+        
+        /* Chapter Screen */
+        #chapter-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 90;
+        }
+        
+        #chapter-screen.hidden {
+            display: none;
+        }
+        
+        #chapter-screen h1 {
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        #chapter-screen h2 {
+            font-size: 1.5rem;
+            color: #888;
+        }
+        
+        /* Pause Menu */
+        #pause-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 80;
+        }
+        
+        #pause-menu.active {
+            display: flex;
+        }
+        
+        #pause-menu h2 {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 30px;
+        }
+        
+        /* Game Over */
+        #game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 90;
+        }
+        
+        #game-over.active {
+            display: flex;
+        }
+        
+        #game-over h1 {
+            font-size: 3rem;
+            color: #ff0000;
+            margin-bottom: 20px;
+        }
+        
+        #game-over p {
+            font-size: 1.2rem;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        /* Victory */
+        #victory {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 90;
+        }
+        
+        #victory.active {
+            display: flex;
+        }
+        
+        #victory h1 {
+            font-size: 3rem;
+            color: #00ff00;
+            margin-bottom: 20px;
+        }
+        
+        /* Mobile warning */
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .game-subtitle {
+                font-size: 1rem;
+            }
+            
+            .menu-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+                min-width: 200px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Main Menu -->
-    <div id="main-menu" class="menu-screen">
-        <div class="menu-content">
-            <h1 class="game-title">THE FORGOTTEN PLAYROOM</h1>
-            <p class="game-subtitle">Un juego de terror en una fábrica de juguetes abandonada</p>
-            
-            <div class="menu-buttons">
-                <button id="btn-play" class="menu-btn">🎯 JUGAR</button>
-                <button id="btn-chapters" class="menu-btn">📖 CAPÍTULOS</button>
-                <button id="btn-characters" class="menu-btn">👹 PERSONAJES</button>
-                <button id="btn-controls" class="menu-btn">🎮 CONTROLES</button>
-                <button id="btn-credits" class="menu-btn">📜 CRÉDITOS</button>
-            </div>
-            
-            <div class="warning-text">
-                ⚠️ Este juego contiene terror y sustos. Recomendado para mayores de 12 años.
-            </div>
+    <div id="main-menu">
+        <h1 class="game-title">THE FORGOTTEN PLAYROOM</h1>
+        <p class="game-subtitle">Un juego de terror en una fábrica de juguetes abandonada</p>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn" id="btn-play">🎯 JUGAR</button>
         </div>
         
-        <div class="menu-background">
-            <div class="floating-toy toy-1">🧸</div>
-            <div class="floating-toy toy-2">🦁</div>
-            <div class="floating-toy toy-3">🤖</div>
-            <div class="floating-toy toy-4">🐀</div>
-            <div class="floating-toy toy-5">🟢</div>
-        </div>
-    </div>
-    
-    <!-- Chapters Menu -->
-    <div id="chapters-menu" class="menu-screen hidden">
-        <div class="menu-content">
-            <h2>📖 SELECCIONA CAPÍTULO</h2>
-            
-            <div class="chapter-list">
-                <div class="chapter-card unlocked" data-chapter="1">
-                    <div class="chapter-number">CAPÍTULO 1</div>
-                    <div class="chapter-title">LA ENTRADA</div>
-                    <div class="chapter-description">Explora la entrada de la fábrica abandonada</div>
-                    <div class="chapter-monsters">Monstruos: Boogo, Catstar</div>
-                </div>
-                
-                <div class="chapter-card unlocked" data-chapter="2">
-                    <div class="chapter-number">CAPÍTULO 2</div>
-                    <div class="chapter-title">EL ALMACÉN</div>
-                    <div class="chapter-description">Los pasillos oscuros del almacén de juguetes</div>
-                    <div class="chapter-monsters">Monstruos: 1028, Ratuile, Slimer</div>
-                </div>
-                
-                <div class="chapter-card unlocked" data-chapter="3">
-                    <div class="chapter-number">CAPÍTULO 3</div>
-                    <div class="chapter-title">EL LABORATORIO</div>
-                    <div class="chapter-description">Secretos oscuros en el laboratorio</div>
-                    <div class="chapter-monsters">Todos los monstruos</div>
-                </div>
-                
-                <div class="chapter-card unlocked" data-chapter="4">
-                    <div class="chapter-number">CAPÍTULO 4</div>
-                    <div class="chapter-title">LA SALA DE EMILY</div>
-                    <div class="chapter-description">Enfrenta a Emily en la batalla final</div>
-                    <div class="chapter-monsters">Boss: Emily</div>
-                </div>
-            </div>
-            
-            <button id="btn-back-chapters" class="menu-btn back-btn">⬅️ VOLVER</button>
-        </div>
-    </div>
-    
-    <!-- Characters Menu -->
-    <div id="characters-menu" class="menu-screen hidden">
-        <div class="menu-content">
-            <h2>👹 PERSONAJES</h2>
-            
-            <div class="character-grid">
-                <div class="character-card" data-character="boogo">
-                    <div class="character-emoji">🧸</div>
-                    <div class="character-name">BOOGO</div>
-                    <div class="character-type">Monstruo Capítulo 1</div>
-                    <div class="character-description">Peluche abandonado. Se teletransporta cuando no lo miras.</div>
-                </div>
-                
-                <div class="character-card" data-character="catstar">
-                    <div class="character-emoji">🦁</div>
-                    <div class="character-name">CATSTAR</div>
-                    <div class="character-type">Monstruo Capítulo 1</div>
-                    <div class="character-description">Gato animatrónico con melena de estrella. Ataca desde las alturas.</div>
-                </div>
-                
-                <div class="character-card" data-character="robot1028">
-                    <div class="character-emoji">🤖</div>
-                    <div class="character-name">1028</div>
-                    <div class="character-type">Monstruo Capítulo 2</div>
-                    <div class="character-description">Robot oxidado con pinzas de acero. ¡Traicionero! Finge ayudar.</div>
-                </div>
-                
-                <div class="character-card" data-character="ratuile">
-                    <div class="character-emoji">🐀</div>
-                    <div class="character-name">RATUILE</div>
-                    <div class="character-type">Monstruo Capítulo 2</div>
-                    <div class="character-description">Rata con 3 emociones: 😊 Feliz, 😟 Triste, 😠 Furioso. ¡Cuidado cuando está furioso!</div>
-                </div>
-                
-                <div class="character-card" data-character="slimer">
-                    <div class="character-emoji">🟢</div>
-                    <div class="character-name">SLIMER</div>
-                    <div class="character-type">Monstruo Capítulo 2</div>
-                    <div class="character-description">Slime con sombrero. Deja rastro viscoso que te ralentiza.</div>
-                </div>
-                
-                <div class="character-card ally" data-character="tecnoplayer">
-                    <div class="character-emoji">📺</div>
-                    <div class="character-name">TECNO PLAYER</div>
-                    <div class="character-type">Aliado Capítulo 2</div>
-                    <div class="character-description">Robot con cabeza de TV. ¡Tu amigo! Te guía y hackea puertas.</div>
-                </div>
-                
-                <div class="character-card boss" data-character="emily">
-                    <div class="character-emoji">👧</div>
-                    <div class="character-name">EMILY</div>
-                    <div class="character-type">Boss Final Capítulo 4</div>
-                    <div class="character-description">La niña fantasma. Controla todos los monstruos. ¡El verdadero villano!</div>
-                </div>
-                
-                <div class="character-card player" data-character="player">
-                    <div class="character-emoji">👤</div>
-                    <div class="character-name">TÚ</div>
-                    <div class="character-type">Jugador</div>
-                    <div class="character-description">Investigador en la fábrica abandonada. Solo tienes una linterna...</div>
-                </div>
-            </div>
-            
-            <button id="btn-back-characters" class="menu-btn back-btn">⬅️ VOLVER</button>
-        </div>
-    </div>
-    
-    <!-- Controls Menu -->
-    <div id="controls-menu" class="menu-screen hidden">
-        <div class="menu-content">
-            <h2>🎮 CONTROLES</h2>
-            
-            <div class="controls-list">
-                <div class="control-item">
-                    <span class="control-key">W A S D</span>
-                    <span class="control-action">Mover personaje</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">↑ ← ↓ →</span>
-                    <span class="control-action">Mover personaje (alternativo)</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">F</span>
-                    <span class="control-action">Encender/Apagar linterna</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">E</span>
-                    <span class="control-action">Interactuar con objetos</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">SPACE</span>
-                    <span class="control-action">Correr (gasta stamina)</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">ESC</span>
-                    <span class="control-action">Pausar juego</span>
-                </div>
-                <div class="control-item">
-                    <span class="control-key">CLICK</span>
-                    <span class="control-action">Apuntar linterna</span>
-                </div>
-            </div>
-            
-            <div class="tips">
-                <h3>💡 CONSEJOS</h3>
-                <ul>
-                    <li>Mantén tu linterna encendida para ver en la oscuridad</li>
-                    <li>No mires directamente a Boogo - se teletransporta</li>
-                    <li>Corre cuando los ojos de 1028 se pongan rojos</li>
-                    <li>Ratuile solo ataca cuando está 😠 FURIOSO</li>
-                    <li>Evita el rastro de Slimer - te ralentiza</li>
-                    <li>Confía en Tecno Player - es tu aliado</li>
-                    <li>Emily miente - no confíes en ella</li>
-                </ul>
-            </div>
-            
-            <button id="btn-back-controls" class="menu-btn back-btn">⬅️ VOLVER</button>
-        </div>
-    </div>
-    
-    <!-- Credits Menu -->
-    <div id="credits-menu" class="menu-screen hidden">
-        <div class="menu-content">
-            <h2>📜 CRÉDITOS</h2>
-            
-            <div class="credits-content">
-                <div class="credit-section">
-                    <h3>🎮 DESARROLLO</h3>
-                    <p>Juego creado con HTML5 Canvas y JavaScript</p>
-                    <p>Desarrollado para navegadores web</p>
-                </div>
-                
-                <div class="credit-section">
-                    <h3>📖 HISTORIA</h3>
-                    <p>Una fábrica de juguetes abandonada desde 1952</p>
-                    <p>Juguetes que cobran vida de forma siniestra</p>
-                    <p>Emily, la niña fantasma que controla todo</p>
-                </div>
-                
-                <div class="credit-section">
-                    <h3>👹 PERSONAJES</h3>
-                    <p>Boogo - El peluche abandonado</p>
-                    <p>Catstar - El gato animatrónico</p>
-                    <p>1028 - El robot traidor</p>
-                    <p>Ratuile - La rata emocional</p>
-                    <p>Slimer - El slime con sombrero</p>
-                    <p>Tecno Player - El robot aliado</p>
-                    <p>Emily - La villana final</p>
-                </div>
-                
-                <div class="credit-section">
-                    <h3>🌐 REPOSITORIO</h3>
-                    <p>github.com/TheForgottenPlayroom/TheForgottenPlayroom</p>
-                </div>
-            </div>
-            
-            <button id="btn-back-credits" class="menu-btn back-btn">⬅️ VOLVER</button>
-        </div>
-    </div>
-    
-    <!-- Pause Menu -->
-    <div id="pause-menu" class="menu-screen hidden">
-        <div class="menu-content">
-            <h2>⏸️ PAUSA</h2>
-            
-            <div class="pause-buttons">
-                <button id="btn-resume" class="menu-btn">▶️ CONTINUAR</button>
-                <button id="btn-restart" class="menu-btn">🔄 REINICIAR</button>
-                <button id="btn-main-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Game Over Screen -->
-    <div id="game-over" class="menu-screen hidden">
-        <div class="menu-content game-over-content">
-            <h2>💀 GAME OVER</h2>
-            <p id="death-message">Has sido atrapado...</p>
-            <p id="death-monster"></p>
-            
-            <div class="game-over-buttons">
-                <button id="btn-retry" class="menu-btn">🔄 REINTENTAR</button>
-                <button id="btn-game-over-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Victory Screen -->
-    <div id="victory-screen" class="menu-screen hidden">
-        <div class="menu-content victory-content">
-            <h2>🎉 ¡VICTORIA!</h2>
-            <p>¡Has escapado de The Forgotten Playroom!</p>
-            <p>Has derrotado a Emily y todos los monstruos.</p>
-            
-            <div class="stats">
-                <p>Tiempo: <span id="victory-time">00:00</span></p>
-                <p>Capítulo completado: <span id="victory-chapter">4</span></p>
-            </div>
-            
-            <button id="btn-victory-menu" class="menu-btn">🏠 MENÚ PRINCIPAL</button>
-        </div>
+        <p class="warning-text">⚠️ Este juego contiene terror y sustos. Recomendado para mayores de 12 años.</p>
     </div>
     
     <!-- Game Container -->
-    <div id="game-container" class="hidden">
+    <div id="game-container">
         <canvas id="game-canvas"></canvas>
         
         <!-- HUD -->
         <div id="hud">
-            <div id="hud-health">
+            <div class="hud-item">
                 <span class="hud-label">❤️ Vida</span>
-                <div class="health-bar">
-                    <div id="health-fill" class="health-fill"></div>
+                <div class="bar-container">
+                    <div class="bar-fill" id="health-fill" style="width: 100%"></div>
                 </div>
             </div>
-            
-            <div id="hud-stamina">
+            <div class="hud-item">
                 <span class="hud-label">⚡ Stamina</span>
-                <div class="stamina-bar">
-                    <div id="stamina-fill" class="stamina-fill"></div>
+                <div class="bar-container">
+                    <div class="bar-fill" id="stamina-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">🔦 Luz</span>
+                <div class="bar-container">
+                    <div class="bar-fill" id="battery-fill" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="hud-chapter">Capítulo 1</div>
+        
+        <!-- Touch Controls -->
+        <div id="touch-controls">
+            <div class="controls-left">
+                <div class="dpad">
+                    <div></div>
+                    <button class="dpad-btn dpad-up" id="btn-up">▲</button>
+                    <div></div>
+                    <button class="dpad-btn dpad-left" id="btn-left">◄</button>
+                    <div class="dpad-center"></div>
+                    <button class="dpad-btn dpad-right" id="btn-right">►</button>
+                    <div></div>
+                    <button class="dpad-btn dpad-down" id="btn-down">▼</button>
+                    <div></div>
                 </div>
             </div>
             
-            <div id="hud-flashlight">
-                <span class="hud-label">🔦 Batería</span>
-                <div class="battery-bar">
-                    <div id="battery-fill" class="battery-fill"></div>
+            <div class="controls-right">
+                <div class="action-buttons">
+                    <div class="action-row">
+                        <button class="action-btn" id="btn-flashlight">🔦</button>
+                        <button class="action-btn" id="btn-interact">✋</button>
+                    </div>
+                    <div class="action-row">
+                        <button class="action-btn" id="btn-run">🏃</button>
+                        <button class="action-btn" id="btn-pause">⏸️</button>
+                    </div>
                 </div>
             </div>
-            
-            <div id="hud-chapter">
-                <span id="chapter-name">Capítulo 1: La Entrada</span>
-            </div>
-            
-            <div id="hud-timer">
-                <span id="game-timer">00:00</span>
-            </div>
-        </div>
-        
-        <!-- Interaction Prompt -->
-        <div id="interaction-prompt" class="hidden">
-            <span id="prompt-text">Presiona E para interactuar</span>
-        </div>
-        
-        <!-- Dialog Box -->
-        <div id="dialog-box" class="hidden">
-            <div id="dialog-character"></div>
-            <div id="dialog-text"></div>
-            <div id="dialog-continue">Click para continuar...</div>
-        </div>
-        
-        <!-- Inventory -->
-        <div id="inventory" class="hidden">
-            <h3>Inventario</h3>
-            <div id="inventory-items"></div>
         </div>
     </div>
     
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="hidden">
-        <div class="loading-content">
-            <h2>Cargando...</h2>
-            <div class="loading-bar">
-                <div id="loading-progress" class="loading-progress"></div>
-            </div>
-            <p id="loading-text">Preparando el horror...</p>
+    <!-- Chapter Screen -->
+    <div id="chapter-screen" class="hidden">
+        <h1 id="chapter-title">Capítulo 1</h1>
+        <h2 id="chapter-subtitle">La Entrada</h2>
+    </div>
+    
+    <!-- Pause Menu -->
+    <div id="pause-menu">
+        <h2>⏸️ PAUSA</h2>
+        <div class="menu-buttons">
+            <button class="menu-btn" id="btn-resume">▶️ CONTINUAR</button>
+            <button class="menu-btn" id="btn-quit">🏠 MENÚ</button>
         </div>
     </div>
     
-    <!-- Touch Controls for Mobile -->
-    <div id="touch-controls">
-        <!-- Left side - D-Pad -->
-        <div class="dpad-container">
-            <button class="dpad-btn dpad-up" data-key="ArrowUp">▲</button>
-            <button class="dpad-btn dpad-down" data-key="ArrowDown">▼</button>
-            <button class="dpad-btn dpad-left" data-key="ArrowLeft">◄</button>
-            <button class="dpad-btn dpad-right" data-key="ArrowRight">►</button>
+    <!-- Game Over -->
+    <div id="game-over">
+        <h1>💀 GAME OVER</h1>
+        <p id="death-message">Has sido atrapado...</p>
+        <div class="menu-buttons">
+            <button class="menu-btn" id="btn-retry">🔄 REINTENTAR</button>
+            <button class="menu-btn" id="btn-home">🏠 MENÚ</button>
         </div>
-        
-        <!-- Right side - Action Buttons -->
-        <div class="action-buttons">
-            <div class="action-row">
-                <button class="touch-btn flashlight" data-key="KeyF" title="Linterna">🔦</button>
-                <button class="touch-btn interact" data-key="KeyE" title="Interactuar">✋</button>
-            </div>
-            <div class="action-row">
-                <button class="touch-btn run" data-key="Space" title="Correr">🏃</button>
-                <button class="touch-btn pause" data-key="Escape" title="Pausa">⏸️</button>
-            </div>
+    </div>
+    
+    <!-- Victory -->
+    <div id="victory">
+        <h1>🎉 ¡VICTORIA!</h1>
+        <p>Has escapado de la fábrica abandonada.</p>
+        <div class="menu-buttons">
+            <button class="menu-btn" id="btn-victory-menu">🏠 MENÚ</button>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/constants.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/input.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/player.js"></script>
-    <script src="js/characters/enemy.js"></script>
-    <script src="js/characters/boogo.js"></script>
-    <script src="js/characters/catstar.js"></script>
-    <script src="js/characters/robot1028.js"></script>
-    <script src="js/characters/ratuile.js"></script>
-    <script src="js/characters/slimer.js"></script>
-    <script src="js/characters/tecnoplayer.js"></script>
-    <script src="js/characters/emily.js"></script>
-    <script src="js/levels/level.js"></script>
-    <script src="js/levels/chapter1.js"></script>
-    <script src="js/levels/chapter2.js"></script>
-    <script src="js/levels/chapter3.js"></script>
-    <script src="js/levels/chapter4.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/main.js"></script>
+    <script>
+        // Simple Game Engine
+        const TILE_SIZE = 32;
+        const PLAYER_SPEED = 3;
+        
+        // Game state
+        let gameState = 'menu';
+        let player = { x: 100, y: 100, health: 100, stamina: 100, battery: 100 };
+        let enemies = [];
+        let level = [];
+        let keys = {};
+        let chapter = 1;
+        
+        // Canvas setup
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Input
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            if (e.code === 'Escape') togglePause();
+            if (e.code === 'KeyF') player.battery = player.battery > 0 ? 0 : 100;
+        });
+        window.addEventListener('keyup', (e) => keys[e.code] = false);
+        
+        // Touch controls
+        function setupTouchButton(id, keyCode) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys[keyCode] = true;
+            });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys[keyCode] = false;
+            });
+        }
+        
+        setupTouchButton('btn-up', 'ArrowUp');
+        setupTouchButton('btn-down', 'ArrowDown');
+        setupTouchButton('btn-left', 'ArrowLeft');
+        setupTouchButton('btn-right', 'ArrowRight');
+        setupTouchButton('btn-flashlight', 'KeyF');
+        setupTouchButton('btn-interact', 'KeyE');
+        setupTouchButton('btn-run', 'Space');
+        
+        document.getElementById('btn-pause')?.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            togglePause();
+        });
+        
+        // Menu buttons
+        document.getElementById('btn-play').addEventListener('click', startGame);
+        document.getElementById('btn-resume').addEventListener('click', () => togglePause());
+        document.getElementById('btn-quit').addEventListener('click', () => {
+            document.getElementById('pause-menu').classList.remove('active');
+            showMenu();
+        });
+        document.getElementById('btn-retry').addEventListener('click', startGame);
+        document.getElementById('btn-home').addEventListener('click', showMenu);
+        document.getElementById('btn-victory-menu').addEventListener('click', showMenu);
+        
+        function showMenu() {
+            gameState = 'menu';
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('game-container').classList.remove('active');
+            document.getElementById('game-over').classList.remove('active');
+            document.getElementById('victory').classList.remove('active');
+        }
+        
+        function startGame() {
+            gameState = 'playing';
+            player = { x: 100, y: 100, health: 100, stamina: 100, battery: 100 };
+            chapter = 1;
+            
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('game-container').classList.add('active');
+            
+            generateLevel();
+            showChapterTitle();
+        }
+        
+        function generateLevel() {
+            level = [];
+            const width = Math.floor(canvas.width / TILE_SIZE) + 2;
+            const height = Math.floor(canvas.height / TILE_SIZE) + 2;
+            
+            for (let y = 0; y < height; y++) {
+                const row = [];
+                for (let x = 0; x < width; x++) {
+                    if (x === 0 || x === width - 1 || y === 0 || y === height - 1) {
+                        row.push(1); // Wall
+                    } else {
+                        row.push(0); // Floor
+                    }
+                }
+                level.push(row);
+            }
+            
+            // Spawn enemies
+            enemies = [];
+            for (let i = 0; i < 3 + chapter; i++) {
+                enemies.push({
+                    x: Math.random() * (canvas.width - 100) + 50,
+                    y: Math.random() * (canvas.height - 100) + 50,
+                    emoji: ['🧸', '🦁', '🤖', '🐀', '🟢'][Math.floor(Math.random() * 5)],
+                    speed: 1 + chapter * 0.5
+                });
+            }
+        }
+        
+        function showChapterTitle() {
+            const screen = document.getElementById('chapter-screen');
+            document.getElementById('chapter-title').textContent = `Capítulo ${chapter}`;
+            document.getElementById('chapter-subtitle').textContent = ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily'][chapter - 1] || 'Final';
+            screen.classList.remove('hidden');
+            
+            setTimeout(() => {
+                screen.classList.add('hidden');
+            }, 2000);
+        }
+        
+        function togglePause() {
+            if (gameState === 'playing') {
+                gameState = 'paused';
+                document.getElementById('pause-menu').classList.add('active');
+            } else if (gameState === 'paused') {
+                gameState = 'playing';
+                document.getElementById('pause-menu').classList.remove('active');
+            }
+        }
+        
+        function showGameOver(msg) {
+            gameState = 'gameover';
+            document.getElementById('death-message').textContent = msg;
+            document.getElementById('game-over').classList.add('active');
+        }
+        
+        function showVictory() {
+            gameState = 'victory';
+            document.getElementById('victory').classList.add('active');
+        }
+        
+        // Game loop
+        function update() {
+            if (gameState !== 'playing') return;
+            
+            // Player movement
+            let dx = 0, dy = 0;
+            if (keys['ArrowUp'] || keys['KeyW']) dy -= PLAYER_SPEED;
+            if (keys['ArrowDown'] || keys['KeyS']) dy += PLAYER_SPEED;
+            if (keys['ArrowLeft'] || keys['KeyA']) dx -= PLAYER_SPEED;
+            if (keys['ArrowRight'] || keys['KeyD']) dx += PLAYER_SPEED;
+            
+            // Run
+            if (keys['Space'] && player.stamina > 0 && (dx !== 0 || dy !== 0)) {
+                player.stamina -= 0.5;
+                dx *= 1.5;
+                dy *= 1.5;
+            } else {
+                player.stamina = Math.min(100, player.stamina + 0.3);
+            }
+            
+            player.x = Math.max(TILE_SIZE, Math.min(canvas.width - TILE_SIZE * 2, player.x + dx));
+            player.y = Math.max(TILE_SIZE, Math.min(canvas.height - TILE_SIZE * 2, player.y + dy));
+            
+            // Battery drain
+            if (player.battery > 0) {
+                player.battery -= 0.05;
+            }
+            
+            // Enemy AI
+            enemies.forEach(enemy => {
+                const dist = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+                if (dist < 200) {
+                    const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                    enemy.x += Math.cos(angle) * enemy.speed;
+                    enemy.y += Math.sin(angle) * enemy.speed;
+                }
+                
+                // Collision
+                if (dist < 30) {
+                    player.health -= 1;
+                    if (player.health <= 0) {
+                        showGameOver(`${enemy.emoji} te atrapó...`);
+                    }
+                }
+            });
+            
+            // Update HUD
+            document.getElementById('health-fill').style.width = player.health + '%';
+            document.getElementById('stamina-fill').style.width = player.stamina + '%';
+            document.getElementById('battery-fill').style.width = player.battery + '%';
+        }
+        
+        function draw() {
+            // Clear
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (gameState !== 'playing' && gameState !== 'paused') return;
+            
+            // Draw floor
+            ctx.fillStyle = '#1a1a1a';
+            for (let y = 0; y < level.length; y++) {
+                for (let x = 0; x < level[y].length; x++) {
+                    if (level[y][x] === 0) {
+                        ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1);
+                    }
+                }
+            }
+            
+            // Draw player
+            ctx.font = '32px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('👤', player.x, player.y);
+            
+            // Draw flashlight effect
+            if (player.battery > 0) {
+                const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 150);
+                gradient.addColorStop(0, 'rgba(255, 255, 200, 0.3)');
+                gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, 150, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Draw enemies
+            enemies.forEach(enemy => {
+                const dist = Math.hypot(enemy.x - player.x, enemy.y - player.y);
+                if (dist < 200 || player.battery > 20) {
+                    ctx.fillText(enemy.emoji, enemy.x, enemy.y);
+                }
+            });
+            
+            // Darkness overlay
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Re-draw visible area
+            if (player.battery > 0) {
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-out';
+                const gradient = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, 150);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, 150, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Start
+        gameLoop();
+        
+        console.log('🎮 Game loaded successfully!');
+    </script>
 </body>
 </html>
