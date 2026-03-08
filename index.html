@@ -22,7 +22,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,7 +32,7 @@
         #menu.hidden { display: none; }
         
         .title {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #FFD700;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
             margin-bottom: 10px;
@@ -41,28 +41,47 @@
         }
         @keyframes flicker {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+            50% { opacity: 0.9; }
+            52% { opacity: 0.7; }
+            54% { opacity: 1; }
         }
         
-        .subtitle { color: #888; margin-bottom: 30px; text-align: center; }
+        .subtitle { color: #888; margin-bottom: 20px; text-align: center; font-size: 0.9rem; }
         
         .btn {
-            padding: 15px 50px;
-            margin: 10px;
-            font-size: 1.2rem;
+            padding: 15px 40px;
+            margin: 8px;
+            font-size: 1.1rem;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             border: 2px solid #FFD700;
             color: #fff;
             border-radius: 10px;
             cursor: pointer;
-            min-width: 200px;
+            min-width: 180px;
+            transition: all 0.3s;
         }
         .btn:active {
             background: #FFD700;
             color: #000;
+            transform: scale(0.98);
         }
         
-        .warning { color: #ff6b6b; margin-top: 30px; font-size: 0.9rem; text-align: center; }
+        .warning { color: #ff6b6b; margin-top: 20px; font-size: 0.8rem; text-align: center; }
+        
+        /* Info boxes */
+        .info-box {
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            max-width: 90%;
+        }
+        .info-box h3 { color: #FFD700; margin-bottom: 10px; }
+        .info-box p { margin: 5px 0; font-size: 0.9rem; }
+        .char { margin: 8px 0; padding: 5px; }
+        .char-good { border-left: 3px solid #0f0; }
+        .char-bad { border-left: 3px solid #f00; }
         
         /* Game */
         #game {
@@ -78,7 +97,7 @@
         canvas {
             width: 100%;
             height: 100%;
-            background: #0a0a0a;
+            background: #111;
         }
         
         /* HUD */
@@ -91,37 +110,38 @@
         .bar {
             display: flex;
             align-items: center;
-            margin: 5px 0;
-            background: rgba(0,0,0,0.7);
+            margin: 3px 0;
+            background: rgba(0,0,0,0.8);
             padding: 5px 10px;
             border-radius: 5px;
         }
-        .bar-label { font-size: 14px; width: 60px; }
-        .bar-outer { width: 80px; height: 10px; background: #333; border-radius: 3px; }
-        .bar-inner { height: 100%; border-radius: 3px; }
-        #healthBar { background: linear-gradient(to right, #f00, #0f0); }
+        .bar-label { font-size: 14px; width: 50px; }
+        .bar-outer { width: 70px; height: 8px; background: #333; border-radius: 4px; }
+        .bar-inner { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        #healthBar { background: #0f0; }
         #staminaBar { background: #0af; }
         #batteryBar { background: #ff0; }
         
-        #chapter {
+        #chapterDisplay {
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             padding: 8px 15px;
             border-radius: 5px;
             font-size: 14px;
+            color: #FFD700;
         }
         
-        /* Touch Controls */
+        /* Controls */
         #controls {
             position: fixed;
-            bottom: 20px;
+            bottom: 15px;
             left: 0;
             right: 0;
             display: flex;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 15px;
             pointer-events: none;
             z-index: 50;
         }
@@ -129,74 +149,48 @@
         
         .dpad {
             display: grid;
-            grid-template-columns: repeat(3, 50px);
-            grid-template-rows: repeat(3, 50px);
-            gap: 5px;
+            grid-template-columns: repeat(3, 45px);
+            grid-template-rows: repeat(3, 45px);
+            gap: 3px;
         }
         .dpad-btn {
+            width: 45px;
+            height: 45px;
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .dpad-btn:active { background: rgba(255,215,0,0.6); }
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+        
+        .actions { display: flex; flex-direction: column; gap: 8px; }
+        .action-row { display: flex; gap: 8px; }
+        .action-btn {
             width: 50px;
             height: 50px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.4);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .dpad-btn:active { background: rgba(255,215,0,0.5); }
-        .dpad-btn:nth-child(1) { grid-column: 2; }
-        .dpad-btn:nth-child(2) { grid-column: 1; grid-row: 2; }
-        .dpad-btn:nth-child(3) { grid-column: 3; grid-row: 2; }
-        .dpad-btn:nth-child(4) { grid-column: 2; grid-row: 3; }
-        
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .action-row { display: flex; gap: 10px; }
-        .action-btn {
-            width: 55px;
-            height: 55px;
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.4);
+            background: rgba(255,255,255,0.25);
+            border: 2px solid rgba(255,255,255,0.5);
             border-radius: 50%;
             color: #fff;
-            font-size: 22px;
+            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
         }
-        .action-btn:active { background: rgba(255,215,0,0.5); }
+        .action-btn:active { background: rgba(255,215,0,0.6); }
         
         /* Overlays */
         .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 80;
-        }
-        .overlay.active { display: flex; }
-        .overlay h1 { font-size: 2.5rem; margin-bottom: 20px; }
-        .overlay p { color: #888; margin-bottom: 30px; }
-        
-        #pause h1 { color: #FFD700; }
-        #gameOver h1 { color: #f00; }
-        #victory h1 { color: #0f0; }
-        
-        /* Chapter */
-        #chapterScreen {
             position: fixed;
             top: 0;
             left: 0;
@@ -207,45 +201,134 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            z-index: 80;
+            padding: 20px;
+        }
+        .overlay.active { display: flex; }
+        .overlay h1 { font-size: 2rem; margin-bottom: 15px; text-align: center; }
+        .overlay p { color: #aaa; margin-bottom: 20px; text-align: center; }
+        
+        #pause h1 { color: #FFD700; }
+        #gameOver h1 { color: #f55; }
+        #victory h1 { color: #5f5; }
+        
+        /* Chapter screen */
+        #chapterScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.98);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             z-index: 90;
         }
         #chapterScreen.active { display: flex; }
-        #chapterScreen h1 { color: #FFD700; font-size: 2rem; }
-        #chapterScreen h2 { color: #888; }
-        
-        @media (max-width: 400px) {
-            .title { font-size: 1.8rem; }
-            .btn { padding: 12px 40px; font-size: 1rem; min-width: 160px; }
-        }
+        #chapterScreen h1 { color: #FFD700; font-size: 1.8rem; }
+        #chapterScreen h2 { color: #888; font-size: 1.2rem; }
+        #chapterScreen p { color: #666; margin-top: 20px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
-    <!-- Menu -->
+    <!-- Menu Principal -->
     <div id="menu">
         <h1 class="title">THE FORGOTTEN PLAYROOM</h1>
-        <p class="subtitle">Juego de terror en una fábrica de juguetes</p>
+        <p class="subtitle">🎮 Eres el detective - Escapa de los monstruos</p>
+        
         <button class="btn" onclick="startGame()">🎯 JUGAR</button>
-        <button class="btn" onclick="showControls()">🎮 CONTROLES</button>
-        <button class="btn" onclick="showChars()">👹 PERSONAJES</button>
-        <p class="warning">⚠️ Terror y sustos. +12 años</p>
+        <button class="btn" onclick="showScreen('controlsScreen')">🎮 CONTROLES</button>
+        <button class="btn" onclick="showScreen('charsScreen')">👹 PERSONAJES</button>
+        
+        <p class="warning">⚠️ Juego de terror - Recomendado +12 años</p>
     </div>
     
-    <!-- Game -->
+    <!-- Controles Screen -->
+    <div id="controlsScreen" class="overlay">
+        <h1>🎮 CÓMO JUGAR</h1>
+        <div class="info-box">
+            <p>👤 <strong>Tú eres el detective</strong> - Escapa de los monstruos</p>
+            <p>🔦 Usa la linterna para ver en la oscuridad</p>
+            <p>🏃 Corre para escapar más rápido (usa stamina)</p>
+            <p>🚪 Llega a la zona verde para pasar de nivel</p>
+        </div>
+        <div class="info-box">
+            <h3>📱 Controles Móviles</h3>
+            <p>⬆️⬇️⬅️➡️ D-Pad: mover</p>
+            <p>🔦 Linterna | ✋ Interactuar</p>
+            <p>🏃 Correr | ⏸️ Pausa</p>
+        </div>
+        <button class="btn" onclick="hideScreen('controlsScreen')">CERRAR</button>
+    </div>
+    
+    <!-- Personajes Screen -->
+    <div id="charsScreen" class="overlay">
+        <h1>👹 PERSONAJES</h1>
+        <div class="info-box">
+            <div class="char char-good">
+                <p>👤 <strong>TÚ - Detective</strong></p>
+                <p style="color:#0f0">Eres el protagonista. ¡Escapa!</p>
+            </div>
+            <div class="char char-good">
+                <p>📺 <strong>Tecno Player</strong></p>
+                <p style="color:#0af">Robot aliado que te ayuda (Capítulo 2+)</p>
+            </div>
+        </div>
+        <div class="info-box">
+            <div class="char char-bad">
+                <p>🧸 <strong>Boogo</strong> - Se teletransporta si no lo miras</p>
+            </div>
+            <div class="char char-bad">
+                <p>🦁 <strong>Catstar</strong> - Ataca desde las alturas</p>
+            </div>
+            <div class="char char-bad">
+                <p>🤖 <strong>1028</strong> - Robot traidor que finge ayudar</p>
+            </div>
+            <div class="char char-bad">
+                <p>🐀 <strong>Ratuile</strong> - Rata con 3 emociones</p>
+            </div>
+            <div class="char char-bad">
+                <p>🟢 <strong>Slimer</strong> - Deja rastro ralentizador</p>
+            </div>
+            <div class="char char-bad">
+                <p>👧 <strong>Emily</strong> - Boss final (Capítulo 4)</p>
+            </div>
+        </div>
+        <button class="btn" onclick="hideScreen('charsScreen')">CERRAR</button>
+    </div>
+    
+    <!-- Game Container -->
     <div id="game">
         <canvas id="canvas"></canvas>
+        
+        <!-- HUD -->
         <div id="hud">
-            <div class="bar"><span class="bar-label">❤️</span><div class="bar-outer"><div class="bar-inner" id="healthBar"></div></div></div>
-            <div class="bar"><span class="bar-label">⚡</span><div class="bar-outer"><div class="bar-inner" id="staminaBar"></div></div></div>
-            <div class="bar"><span class="bar-label">🔦</span><div class="bar-outer"><div class="bar-inner" id="batteryBar"></div></div></div>
+            <div class="bar">
+                <span class="bar-label">❤️</span>
+                <div class="bar-outer"><div class="bar-inner" id="healthBar" style="width:100%"></div></div>
+            </div>
+            <div class="bar">
+                <span class="bar-label">⚡</span>
+                <div class="bar-outer"><div class="bar-inner" id="staminaBar" style="width:100%"></div></div>
+            </div>
+            <div class="bar">
+                <span class="bar-label">🔦</span>
+                <div class="bar-outer"><div class="bar-inner" id="batteryBar" style="width:100%"></div></div>
+            </div>
         </div>
-        <div id="chapter">Capítulo 1</div>
+        
+        <div id="chapterDisplay">Capítulo 1</div>
+        
+        <!-- Touch Controls -->
         <div id="controls">
             <div>
                 <div class="dpad">
-                    <button class="dpad-btn" id="up">▲</button>
-                    <button class="dpad-btn" id="left">◄</button>
-                    <button class="dpad-btn" id="right">►</button>
-                    <button class="dpad-btn" id="down">▼</button>
+                    <button class="dpad-btn dpad-up" id="up">▲</button>
+                    <button class="dpad-btn dpad-left" id="left">◄</button>
+                    <button class="dpad-btn dpad-right" id="right">►</button>
+                    <button class="dpad-btn dpad-down" id="down">▼</button>
                 </div>
             </div>
             <div class="actions">
@@ -265,13 +348,15 @@
     <div id="chapterScreen">
         <h1 id="chapTitle">Capítulo 1</h1>
         <h2 id="chapSub">La Entrada</h2>
+        <p>Sobrevive y encuentra la salida</p>
     </div>
     
     <!-- Pause -->
     <div id="pause" class="overlay">
         <h1>⏸️ PAUSA</h1>
-        <button class="btn" onclick="resume()">▶️ CONTINUAR</button>
-        <button class="btn" onclick="quit()">🏠 MENÚ</button>
+        <p>El juego está pausado</p>
+        <button class="btn" onclick="resumeGame()">▶️ CONTINUAR</button>
+        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
     </div>
     
     <!-- Game Over -->
@@ -279,39 +364,29 @@
         <h1>💀 GAME OVER</h1>
         <p id="deathMsg">Has sido atrapado...</p>
         <button class="btn" onclick="startGame()">🔄 REINTENTAR</button>
-        <button class="btn" onclick="quit()">🏠 MENÚ</button>
+        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
     </div>
     
     <!-- Victory -->
     <div id="victory" class="overlay">
         <h1>🎉 ¡VICTORIA!</h1>
-        <p>Has escapado de la fábrica.</p>
-        <button class="btn" onclick="quit()">🏠 MENÚ</button>
-    </div>
-    
-    <!-- Controls Info -->
-    <div id="controlsInfo" class="overlay">
-        <h1>🎮 CONTROLES</h1>
-        <p>WASD / Flechas: Mover</p>
-        <p>F: Linterna | E: Interactuar</p>
-        <p>ESPACIO: Correr | ESC: Pausa</p>
-        <button class="btn" onclick="hideControls()">Cerrar</button>
-    </div>
-    
-    <!-- Characters -->
-    <div id="charsInfo" class="overlay">
-        <h1>👹 PERSONAJES</h1>
-        <p>🧸 Boogo - Se teletransporta</p>
-        <p>🦁 Catstar - Ataca desde arriba</p>
-        <p>🤖 1028 - Robot traidor</p>
-        <p>🐀 Ratuile - Rata con emociones</p>
-        <p>🟢 Slimer - Deja rastro</p>
-        <p>👧 Emily - Boss final</p>
-        <button class="btn" onclick="hideChars()">Cerrar</button>
+        <p>¡Has escapado de la fábrica!</p>
+        <button class="btn" onclick="startGame()">🔄 JUGAR DE NUEVO</button>
+        <button class="btn" onclick="quitGame()">🏠 MENÚ</button>
     </div>
 
     <script>
-        // Canvas setup
+        // ========== CONFIGURACIÓN ==========
+        const TILE_SIZE = 40;
+        const PLAYER_SIZE = 24;
+        const PLAYER_SPEED = 4;
+        const PLAYER_RUN_SPEED = 7;
+        const ENEMY_SPEED = 1.5;
+        const ENEMY_RANGE = 200;
+        const FLASHLIGHT_RADIUS = 180;
+        const SAFE_DISTANCE = 300; // Distancia mínima de spawn de enemigos
+        
+        // ========== CANVAS SETUP ==========
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         let W, H;
@@ -323,231 +398,363 @@
         resize();
         window.addEventListener('resize', resize);
         
-        // Game state
-        let state = 'menu';
-        let player = { x: 100, y: 100, health: 100, stamina: 100, battery: 100 };
-        let enemies = [];
-        let keys = {};
+        // ========== ESTADO DEL JUEGO ==========
+        let state = 'menu'; // menu, playing, paused, gameover, victory
         let chapter = 1;
+        let player = {};
+        let enemies = [];
+        let exit = {};
+        let keys = {};
+        let invincible = false;
+        let invincibleTimer = 0;
         
-        // Input
+        // ========== INPUT ==========
         window.addEventListener('keydown', e => {
             keys[e.code] = true;
-            if (e.code === 'Escape') togglePause();
-            if (e.code === 'KeyF') player.battery = player.battery > 0 ? 0 : 100;
+            if (e.code === 'Escape' && state === 'playing') pauseGame();
+            if (e.code === 'Escape' && state === 'paused') resumeGame();
         });
         window.addEventListener('keyup', e => keys[e.code] = false);
         
         // Touch controls
-        function touch(id, code, down = true) {
+        ['up', 'down', 'left', 'right'].forEach(id => {
             const btn = document.getElementById(id);
-            if (!btn) return;
-            const fn = down ? 
-                () => keys[code] = true :
-                () => keys[code] = false;
+            const code = {
+                'up': 'ArrowUp',
+                'down': 'ArrowDown', 
+                'left': 'ArrowLeft',
+                'right': 'ArrowRight'
+            }[id];
             btn.addEventListener('touchstart', e => { e.preventDefault(); keys[code] = true; });
             btn.addEventListener('touchend', e => { e.preventDefault(); keys[code] = false; });
+        });
+        
+        document.getElementById('flashlight').addEventListener('touchstart', e => { 
+            e.preventDefault(); 
+            player.battery = player.battery > 0 ? 0 : 100; 
+        });
+        document.getElementById('run').addEventListener('touchstart', e => { e.preventDefault(); keys['Space'] = true; });
+        document.getElementById('run').addEventListener('touchend', e => { e.preventDefault(); keys['Space'] = false; });
+        document.getElementById('pause').addEventListener('touchstart', e => { 
+            e.preventDefault(); 
+            if (state === 'playing') pauseGame();
+            else if (state === 'paused') resumeGame();
+        });
+        
+        // ========== FUNCIONES DE PANTALLA ==========
+        function showScreen(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function hideScreen(id) {
+            document.getElementById(id).classList.remove('active');
         }
         
-        touch('up', 'ArrowUp');
-        touch('down', 'ArrowDown');
-        touch('left', 'ArrowLeft');
-        touch('right', 'ArrowRight');
-        touch('flashlight', 'KeyF');
-        touch('interact', 'KeyE');
-        touch('run', 'Space');
-        document.getElementById('pause').addEventListener('touchstart', e => { e.preventDefault(); togglePause(); });
-        
-        // Menu functions
-        function startGame() {
-            console.log('Starting game...');
+        function pauseGame() {
+            state = 'paused';
+            showScreen('pause');
+        }
+        function resumeGame() {
             state = 'playing';
-            player = { x: W/2, y: H/2, health: 100, stamina: 100, battery: 100 };
+            hideScreen('pause');
+        }
+        function quitGame() {
+            state = 'menu';
+            hideScreen('pause');
+            hideScreen('gameOver');
+            hideScreen('victory');
+            document.getElementById('menu').classList.remove('hidden');
+            document.getElementById('game').classList.remove('active');
+        }
+        
+        // ========== INICIAR JUEGO ==========
+        function startGame() {
+            state = 'playing';
             chapter = 1;
+            
+            // Inicializar jugador en el centro
+            player = {
+                x: W / 2,
+                y: H / 2,
+                health: 100,
+                stamina: 100,
+                battery: 100
+            };
+            
+            // Spawn de enemigos lejos del jugador
             spawnEnemies();
             
+            // Crear salida en esquina opuesta
+            exit = { x: W - 80, y: H - 80, radius: 40 };
+            
+            // Reset invincibilidad
+            invincible = false;
+            invincibleTimer = 0;
+            
+            // Ocultar menús
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('game').classList.add('active');
-            document.getElementById('gameOver').classList.remove('active');
-            document.getElementById('victory').classList.remove('active');
+            hideScreen('gameOver');
+            hideScreen('victory');
             
-            showChapter();
+            // Mostrar título del capítulo
+            showChapterTitle();
         }
         
-        function showChapter() {
+        function showChapterTitle() {
             const names = ['La Entrada', 'El Almacén', 'El Laboratorio', 'La Sala de Emily'];
             document.getElementById('chapTitle').textContent = 'Capítulo ' + chapter;
-            document.getElementById('chapSub').textContent = names[chapter-1] || 'Final';
+            document.getElementById('chapSub').textContent = names[chapter - 1] || 'Final';
             document.getElementById('chapterScreen').classList.add('active');
             setTimeout(() => document.getElementById('chapterScreen').classList.remove('active'), 2000);
         }
         
         function spawnEnemies() {
             enemies = [];
-            const count = 2 + chapter;
+            const count = 1 + chapter; // 2, 3, 4, 5 enemigos
             const types = ['🧸', '🦁', '🤖', '🐀', '🟢'];
+            
             for (let i = 0; i < count; i++) {
+                let x, y;
+                do {
+                    x = Math.random() * (W - 100) + 50;
+                    y = Math.random() * (H - 100) + 50;
+                } while (Math.hypot(x - player.x, y - player.y) < SAFE_DISTANCE);
+                
                 enemies.push({
-                    x: Math.random() * (W - 200) + 100,
-                    y: Math.random() * (H - 200) + 100,
+                    x: x,
+                    y: y,
                     emoji: types[i % types.length],
-                    speed: 1 + chapter * 0.3,
-                    angle: Math.random() * Math.PI * 2
+                    speed: ENEMY_SPEED + (chapter * 0.3),
+                    angle: Math.random() * Math.PI * 2,
+                    state: 'patrol' // patrol, chase
                 });
             }
         }
         
-        function togglePause() {
-            if (state === 'playing') {
-                state = 'paused';
-                document.getElementById('pause').classList.add('active');
-            } else if (state === 'paused') {
-                state = 'playing';
-                document.getElementById('pause').classList.remove('active');
+        function nextChapter() {
+            chapter++;
+            if (chapter > 4) {
+                // Victoria
+                state = 'victory';
+                showScreen('victory');
+            } else {
+                player.x = W / 2;
+                player.y = H / 2;
+                player.health = Math.min(100, player.health + 30);
+                player.battery = 100;
+                spawnEnemies();
+                showChapterTitle();
             }
         }
         
-        function resume() {
-            state = 'playing';
-            document.getElementById('pause').classList.remove('active');
-        }
-        
-        function quit() {
-            state = 'menu';
-            document.getElementById('menu').classList.remove('hidden');
-            document.getElementById('game').classList.remove('active');
-            document.getElementById('pause').classList.remove('active');
-            document.getElementById('gameOver').classList.remove('active');
-            document.getElementById('victory').classList.remove('active');
-        }
-        
-        function showControls() {
-            document.getElementById('controlsInfo').classList.add('active');
-        }
-        
-        function hideControls() {
-            document.getElementById('controlsInfo').classList.remove('active');
-        }
-        
-        function showChars() {
-            document.getElementById('charsInfo').classList.add('active');
-        }
-        
-        function hideChars() {
-            document.getElementById('charsInfo').classList.remove('active');
-        }
-        
-        // Game loop
+        // ========== GAME LOOP ==========
         function update() {
             if (state !== 'playing') return;
             
-            // Movement
-            let dx = 0, dy = 0;
-            if (keys['ArrowUp'] || keys['KeyW']) dy -= 3;
-            if (keys['ArrowDown'] || keys['KeyS']) dy += 3;
-            if (keys['ArrowLeft'] || keys['KeyA']) dx -= 3;
-            if (keys['ArrowRight'] || keys['KeyD']) dx += 3;
-            
-            // Run
-            if ((keys['Space'] || keys['ShiftLeft']) && player.stamina > 0 && (dx || dy)) {
-                player.stamina -= 0.5;
-                dx *= 1.5;
-                dy *= 1.5;
-            } else {
-                player.stamina = Math.min(100, player.stamina + 0.2);
+            // Actualizar invencibilidad
+            if (invincible) {
+                invincibleTimer--;
+                if (invincibleTimer <= 0) invincible = false;
             }
             
-            player.x = Math.max(50, Math.min(W - 50, player.x + dx));
-            player.y = Math.max(50, Math.min(H - 50, player.y + dy));
+            // ===== MOVIMIENTO DEL JUGADOR =====
+            let dx = 0, dy = 0;
+            if (keys['ArrowUp'] || keys['KeyW']) dy -= 1;
+            if (keys['ArrowDown'] || keys['KeyS']) dy += 1;
+            if (keys['ArrowLeft'] || keys['KeyA']) dx -= 1;
+            if (keys['ArrowRight'] || keys['KeyD']) dx += 1;
             
-            // Battery
-            player.battery = Math.max(0, player.battery - 0.03);
+            // Normalizar velocidad diagonal
+            const mag = Math.hypot(dx, dy);
+            if (mag > 0) {
+                dx /= mag;
+                dy /= mag;
+            }
             
-            // Enemies
-            enemies.forEach(e => {
-                const dist = Math.hypot(player.x - e.x, player.y - e.y);
-                if (dist < 300) {
-                    e.angle = Math.atan2(player.y - e.y, player.x - e.x);
-                }
-                e.x += Math.cos(e.angle) * e.speed;
-                e.y += Math.sin(e.angle) * e.speed;
+            // Correr
+            let speed = PLAYER_SPEED;
+            if ((keys['Space'] || keys['ShiftLeft']) && player.stamina > 0 && mag > 0) {
+                speed = PLAYER_RUN_SPEED;
+                player.stamina -= 0.8;
+            } else {
+                player.stamina = Math.min(100, player.stamina + 0.3);
+            }
+            
+            player.x += dx * speed;
+            player.y += dy * speed;
+            
+            // Límites del canvas
+            player.x = Math.max(PLAYER_SIZE, Math.min(W - PLAYER_SIZE, player.x));
+            player.y = Math.max(PLAYER_SIZE, Math.min(H - PLAYER_SIZE, player.y));
+            
+            // Batería de linterna
+            player.battery = Math.max(0, player.battery - 0.02);
+            
+            // ===== IA DE ENEMIGOS =====
+            enemies.forEach(enemy => {
+                const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
                 
-                // Collision
-                if (dist < 40) {
-                    player.health -= 0.5;
-                    // Push back
-                    const pushAngle = Math.atan2(e.y - player.y, e.x - player.x);
-                    e.x += Math.cos(pushAngle) * 20;
-                    e.y += Math.sin(pushAngle) * 20;
+                // Estado: perseguir si está en rango
+                if (dist < ENEMY_RANGE && player.battery > 10) {
+                    enemy.state = 'chase';
+                    const angle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                    enemy.x += Math.cos(angle) * enemy.speed;
+                    enemy.y += Math.sin(angle) * enemy.speed;
+                } else {
+                    enemy.state = 'patrol';
+                    // Patrullar aleatoriamente
+                    enemy.angle += (Math.random() - 0.5) * 0.1;
+                    enemy.x += Math.cos(enemy.angle) * enemy.speed * 0.5;
+                    enemy.y += Math.sin(enemy.angle) * enemy.speed * 0.5;
+                    
+                    // Mantener dentro del canvas
+                    if (enemy.x < 50 || enemy.x > W - 50) enemy.angle = Math.PI - enemy.angle;
+                    if (enemy.y < 50 || enemy.y > H - 50) enemy.angle = -enemy.angle;
+                }
+                
+                // Mantener dentro del canvas
+                enemy.x = Math.max(30, Math.min(W - 30, enemy.x));
+                enemy.y = Math.max(30, Math.min(H - 30, enemy.y));
+                
+                // Colisión con jugador
+                if (dist < 35 && !invincible) {
+                    player.health -= 25;
+                    invincible = true;
+                    invincibleTimer = 60; // 1 segundo de invencibilidad
+                    
+                    // Empujar enemigo
+                    const pushAngle = Math.atan2(player.y - enemy.y, player.x - enemy.x);
+                    enemy.x -= Math.cos(pushAngle) * 50;
+                    enemy.y -= Math.sin(pushAngle) * 50;
                 }
             });
             
-            // Check game over
-            if (player.health <= 0) {
-                state = 'gameover';
-                const msgs = ['💀 Has sido atrapado...', '🧸 Boogo te encontró...', '🦁 Catstar te atacó...'];
-                document.getElementById('deathMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
-                document.getElementById('gameOver').classList.add('active');
+            // ===== VERIFICAR SI LLEGÓ A LA SALIDA =====
+            const exitDist = Math.hypot(player.x - exit.x, player.y - exit.y);
+            if (exitDist < exit.radius + PLAYER_SIZE) {
+                nextChapter();
             }
             
-            // Update HUD
+            // ===== GAME OVER =====
+            if (player.health <= 0) {
+                state = 'gameover';
+                const msgs = [
+                    '💀 Has sido atrapado...',
+                    '🧸 Boogo te encontró...',
+                    '🦁 Catstar te atacó...',
+                    '🤖 1028 te traicionó...',
+                    '🐀 Ratuile te mordió...',
+                    '🟢 Slimer te atrapó...'
+                ];
+                document.getElementById('deathMsg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+                showScreen('gameOver');
+            }
+            
+            // ===== ACTUALIZAR HUD =====
             document.getElementById('healthBar').style.width = player.health + '%';
             document.getElementById('staminaBar').style.width = player.stamina + '%';
             document.getElementById('batteryBar').style.width = player.battery + '%';
-            document.getElementById('chapter').textContent = 'Capítulo ' + chapter;
+            
+            // Color de la barra de vida
+            const healthBar = document.getElementById('healthBar');
+            if (player.health > 60) healthBar.style.background = '#0f0';
+            else if (player.health > 30) healthBar.style.background = '#ff0';
+            else healthBar.style.background = '#f00';
+            
+            document.getElementById('chapterDisplay').textContent = 'Capítulo ' + chapter;
         }
         
         function draw() {
-            ctx.fillStyle = '#0a0a0a';
+            // Fondo
+            ctx.fillStyle = '#111';
             ctx.fillRect(0, 0, W, H);
             
             if (state !== 'playing' && state !== 'paused') return;
             
-            // Floor
+            // Suelo
             ctx.fillStyle = '#1a1a1a';
-            for (let x = 0; x < W; x += 40) {
-                for (let y = 0; y < H; y += 40) {
-                    ctx.fillRect(x, y, 38, 38);
+            for (let x = 0; x < W; x += TILE_SIZE) {
+                for (let y = 0; y < H; y += TILE_SIZE) {
+                    ctx.fillRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
                 }
             }
             
-            // Enemies
-            ctx.font = '36px Arial';
+            // Zona de salida (verde)
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+            ctx.beginPath();
+            ctx.arc(exit.x, exit.y, exit.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#0f0';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.font = '20px Arial';
+            ctx.fillStyle = '#0f0';
             ctx.textAlign = 'center';
-            enemies.forEach(e => {
-                const dist = Math.hypot(player.x - e.x, player.y - e.y);
-                if (dist < 250 || player.battery > 30) {
-                    ctx.fillText(e.emoji, e.x, e.y);
+            ctx.fillText('🚪', exit.x, exit.y + 7);
+            
+            // Enemigos (solo visibles en rango de linterna)
+            ctx.font = '32px Arial';
+            ctx.textAlign = 'center';
+            enemies.forEach(enemy => {
+                const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y);
+                if (dist < FLASHLIGHT_RADIUS || player.battery > 50) {
+                    ctx.fillText(enemy.emoji, enemy.x, enemy.y);
                 }
             });
             
-            // Player
-            ctx.fillText('👤', player.x, player.y);
+            // Jugador (parpadea si invencible)
+            if (!invincible || Math.floor(Date.now() / 100) % 2 === 0) {
+                ctx.font = '28px Arial';
+                ctx.fillText('👤', player.x, player.y);
+            }
             
-            // Flashlight
+            // Efecto de linterna (oscuridad)
             if (player.battery > 0) {
-                const r = Math.min(150, player.battery * 1.5);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+                ctx.fillRect(0, 0, W, H);
+                
+                // Crear agujero de luz
                 ctx.save();
                 ctx.globalCompositeOperation = 'destination-out';
-                const grad = ctx.createRadialGradient(player.x, player.y, 0, player.x, player.y, r);
+                const grad = ctx.createRadialGradient(
+                    player.x, player.y, 0,
+                    player.x, player.y, FLASHLIGHT_RADIUS * (player.battery / 100)
+                );
                 grad.addColorStop(0, 'rgba(0,0,0,1)');
                 grad.addColorStop(1, 'rgba(0,0,0,0)');
                 ctx.fillStyle = grad;
                 ctx.beginPath();
-                ctx.arc(player.x, player.y, r, 0, Math.PI * 2);
+                ctx.arc(player.x, player.y, FLASHLIGHT_RADIUS, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
+            
+            // Indicador de dirección hacia la salida
+            const exitAngle = Math.atan2(exit.y - player.y, exit.x - player.x);
+            const arrowDist = 50;
+            ctx.save();
+            ctx.translate(player.x + Math.cos(exitAngle) * arrowDist, player.y + Math.sin(exitAngle) * arrowDist);
+            ctx.rotate(exitAngle);
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.7)';
+            ctx.beginPath();
+            ctx.moveTo(15, 0);
+            ctx.lineTo(-5, -8);
+            ctx.lineTo(-5, 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
         }
         
-        function loop() {
+        function gameLoop() {
             update();
             draw();
-            requestAnimationFrame(loop);
+            requestAnimationFrame(gameLoop);
         }
         
-        loop();
-        console.log('🎮 Game ready!');
+        // Iniciar
+        gameLoop();
+        
+        console.log('🎮 Juego listo');
     </script>
 </body>
 </html>
