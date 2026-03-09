@@ -365,6 +365,12 @@
     function startGame() {
         console.log('▶ Iniciando partida...');
         
+        // Forzar ocultar TODOS los overlays
+        document.getElementById('chapterScreen').classList.remove('active');
+        document.getElementById('gameOver').classList.remove('active');
+        document.getElementById('victory').classList.remove('active');
+        document.getElementById('countdown').classList.remove('active');
+        
         state.screen = 'playing';
         state.chapter = 1;
         state.player = { x: W/2, y: H/2, hp: 100, stamina: 100, light: 100 };
